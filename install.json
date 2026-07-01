@@ -1,0 +1,21 @@
+{
+  "run": [
+    {
+      "method": "shell.run",
+      "params": {
+        "message": [
+          "git clone https://github.com/gantasmo/theDAW app"
+        ]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "chain": true,
+        "input": null,
+        "message": []
+      }
+    }
+  ]
+}

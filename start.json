@@ -1,0 +1,28 @@
+{
+  "daemon": true,
+  "run": [
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "chain": true,
+        "env": {},
+        "input": null,
+        "message": [],
+        "on": [
+          {
+            "event": "/http://[^\\s\\n\\r]+/",
+            "done": true
+          }
+        ]
+      }
+    },
+    {
+      "when": "{{input && input.event && Array.isArray(input.event) && input.event.length > 0}}",
+      "method": "local.set",
+      "params": {
+        "url": "{{input.event[0]}}"
+      }
+    }
+  ]
+}
