@@ -1,0 +1,15 @@
+{
+  "title": "theDAW",
+  "description": "All-in-one AI music studio by GANTASMO. Stable Audio 3 and Magenta RealTime 2 generation, Chimera multi-track fusion, Demucs stems, MIDI and notation, DJ and VJ rigs, DAW project import, VST3 and .gan plugins, and a RAG-backed in-app assistant.",
+  "icon": "icon.png",
+  "links": [
+    {
+      "title": "GitHub",
+      "value": "https://github.com/gantasmo/theDAW"
+    },
+    {
+      "title": "GANTASMO",
+      "value": "https://gantasmo.com"
+    }
+  ]
+}

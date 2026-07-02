@@ -36,7 +36,7 @@ module.exports = {
     *     let absolute_path = info.path("install.json")
     * 
     **********************************************************************************************/
-    let installed = info.exists("app/node_modules")
+    let installed = info.exists("app/.venv") && info.exists("app/frontend/node_modules")
     let running = {
       install: info.running("install.json"),
       start: info.running("start.json"),

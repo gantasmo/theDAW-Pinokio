@@ -1,6 +1,10 @@
 {
+  "requires": {
+    "bundle": "ai"
+  },
   "run": [
     {
+      "when": "{{!exists('app')}}",
       "method": "shell.run",
       "params": {
         "message": [
@@ -12,9 +16,35 @@
       "method": "shell.run",
       "params": {
         "path": "app",
-        "chain": true,
-        "input": null,
-        "message": []
+        "message": [
+          "git submodule update --init --recursive"
+        ]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "message": [
+          "conda install -y -c conda-forge ffmpeg"
+        ]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "message": [
+          "uv sync --group dev"
+        ]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app/frontend",
+        "message": [
+          "npm install"
+        ]
       }
     }
   ]

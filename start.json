@@ -5,10 +5,26 @@
       "method": "shell.run",
       "params": {
         "path": "app",
-        "chain": true,
         "env": {},
-        "input": null,
-        "message": [],
+        "message": [
+          "uv run uvicorn backend.server:app --port 8600"
+        ],
+        "on": [
+          {
+            "event": "/Uvicorn running on /i",
+            "done": true
+          }
+        ]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app/frontend",
+        "env": {},
+        "message": [
+          "npm run dev"
+        ],
         "on": [
           {
             "event": "/http://[^\\s\\n\\r]+/",

@@ -13,10 +13,23 @@ module.exports = {
   }, {
     method: "shell.run",
     params: {
+      message: "git submodule update --init --recursive",
+      path: "app"
+    }
+  }, {
+    method: "shell.run",
+    params: {
       path: "app",
       message: [
-        // add the command to run after pulling in updates from the git repo
-        // for example to reinstall the dependencies, etc.
+        "uv sync --group dev"
+      ]
+    }
+  }, {
+    method: "shell.run",
+    params: {
+      path: "app/frontend",
+      message: [
+        "npm install"
       ]
     }
   }]
