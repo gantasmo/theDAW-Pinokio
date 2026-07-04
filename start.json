@@ -5,7 +5,9 @@
       "method": "shell.run",
       "params": {
         "path": "app",
-        "env": {},
+        "env": {
+          "HF_HOME": "{{path.resolve(os.homedir(), '.cache', 'huggingface')}}"
+        },
         "message": [
           "uv run uvicorn backend.server:app --port 8600"
         ],

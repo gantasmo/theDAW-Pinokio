@@ -9,7 +9,7 @@ One-click launcher for [theDAW](https://github.com/gantasmo/theDAW), the all-in-
 - **Update** pulls the launcher and the app repos, refreshes the submodule, and re-syncs Python and npm dependencies.
 - **Reset** deletes `app/.venv` and `app/frontend/node_modules` so the next Install starts from clean dependencies.
 
-Models are not downloaded at install time. theDAW runs in local-only mode by default and downloads a model the first time a generation needs it.
+Models are not downloaded at install time. theDAW runs in local-only mode by default and downloads a model the first time a generation needs it. The launcher points `HF_HOME` at the standard user Hugging Face cache (`~/.cache/huggingface`) rather than an isolated per-app cache, so checkpoints and the Hugging Face auth token already on the machine are reused. The Stable Audio 3 and t5gemma repos are gated, so a first-ever download needs a Hugging Face token (`hf auth login`, or the in-app download manager).
 
 ## Platform behavior
 

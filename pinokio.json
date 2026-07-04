@@ -11,5 +11,8 @@
       "title": "GANTASMO",
       "value": "https://gantasmo.com"
     }
-  ]
+  ],
+  "plugin": {
+    "menu": []
+  }
 }
