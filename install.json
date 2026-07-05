@@ -46,6 +46,25 @@
           "npm install"
         ]
       }
+    },
+    {
+      "when": "{{!exists('app/vj')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "message": [
+          "git clone https://github.com/gantasmo/VJ-9000 vj"
+        ]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app/vj",
+        "message": [
+          "npm install"
+        ]
+      }
     }
   ]
 }
