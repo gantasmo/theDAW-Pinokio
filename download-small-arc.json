@@ -1,0 +1,21 @@
+{
+  "run": [
+    {
+      "when": "{{!exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-small-music')}}",
+      "method": "hf.download",
+      "params": {
+        "_": ["cocktailpeanut/stable-audio-3-small-music"]
+      }
+    },
+    {
+      "when": "{{exists('cache/HF_HOME/hub/models--cocktailpeanut--stable-audio-3-small-music') && !exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-small-music')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "cache/HF_HOME/hub",
+        "message": [
+          "node -e \"require('fs').renameSync('models--cocktailpeanut--stable-audio-3-small-music','models--stabilityai--stable-audio-3-small-music')\""
+        ]
+      }
+    }
+  ]
+}

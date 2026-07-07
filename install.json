@@ -7,44 +7,49 @@
       "when": "{{!exists('app')}}",
       "method": "shell.run",
       "params": {
-        "message": [
-          "git clone https://github.com/gantasmo/theDAW app"
-        ]
+        "message": ["git clone https://github.com/gantasmo/theDAW app"]
       }
     },
     {
       "method": "shell.run",
       "params": {
         "path": "app",
-        "message": [
-          "git submodule update --init --recursive"
-        ]
+        "message": ["git submodule update --init --recursive"]
       }
     },
     {
+      "when": "{{platform === 'linux'}}",
       "method": "shell.run",
       "params": {
         "message": [
-          "conda install -y -c conda-forge ffmpeg"
+          "conda install -y -c conda-forge c-compiler cxx-compiler make pkg-config"
         ]
       }
     },
     {
+      "when": "{{platform === 'darwin'}}",
       "method": "shell.run",
       "params": {
         "path": "app",
-        "message": [
-          "uv sync --group dev"
-        ]
+        "env": {
+          "CFLAGS": "-Wno-incompatible-function-pointer-types"
+        },
+        "message": ["uv sync --group dev"]
+      }
+    },
+    {
+      "when": "{{platform !== 'darwin'}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "message": ["uv sync --group dev"]
       }
     },
     {
       "method": "shell.run",
       "params": {
         "path": "app/frontend",
-        "message": [
-          "npm install"
-        ]
+        "message": ["npm install"]
       }
     },
     {
@@ -52,17 +57,47 @@
       "method": "shell.run",
       "params": {
         "path": "app",
-        "message": [
-          "git clone https://github.com/gantasmo/VJ-9000 vj"
-        ]
+        "message": ["git clone https://github.com/gantasmo/VJ-9000 vj"]
       }
     },
     {
       "method": "shell.run",
       "params": {
         "path": "app/vj",
+        "message": ["npm install"]
+      }
+    },
+    {
+      "when": "{{platform === 'darwin' && !exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-small-music')}}",
+      "method": "hf.download",
+      "params": {
+        "_": ["cocktailpeanut/stable-audio-3-small-music"]
+      }
+    },
+    {
+      "when": "{{platform === 'darwin' && exists('cache/HF_HOME/hub/models--cocktailpeanut--stable-audio-3-small-music') && !exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-small-music')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "cache/HF_HOME/hub",
         "message": [
-          "npm install"
+          "node -e \"require('fs').renameSync('models--cocktailpeanut--stable-audio-3-small-music','models--stabilityai--stable-audio-3-small-music')\""
+        ]
+      }
+    },
+    {
+      "when": "{{platform !== 'darwin' && !exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-medium')}}",
+      "method": "hf.download",
+      "params": {
+        "_": ["cocktailpeanut/stable-audio-3-medium"]
+      }
+    },
+    {
+      "when": "{{platform !== 'darwin' && exists('cache/HF_HOME/hub/models--cocktailpeanut--stable-audio-3-medium') && !exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-medium')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "cache/HF_HOME/hub",
+        "message": [
+          "node -e \"require('fs').renameSync('models--cocktailpeanut--stable-audio-3-medium','models--stabilityai--stable-audio-3-medium')\""
         ]
       }
     }

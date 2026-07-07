@@ -37,6 +37,20 @@ module.exports = {
     * 
     **********************************************************************************************/
     let installed = info.exists("app/.venv") && info.exists("app/frontend/node_modules")
+    let downloading = [
+      "download-small-arc.json",
+      "download-small-rf.json",
+      "download-medium-arc.json",
+      "download-medium-rf.json"
+    ]
+    let is_downloading = null
+    for(let item of downloading) {
+      let d = info.running(item)
+      if (d === true) {
+        is_downloading = item
+        break;
+      }
+    }
     let running = {
       install: info.running("install.json"),
       start: info.running("start.json"),
@@ -45,6 +59,7 @@ module.exports = {
     }
     if (running.install) {
       return [{
+        default: true,
         icon: "fa-solid fa-plug",
         text: "Installing",
         href: "install.json",
@@ -54,48 +69,79 @@ module.exports = {
         let local = info.local("start.json")
         if (local && local.url) {
           return [{
-            icon: "fa-solid fa-power-off",
-            text: "Server",
-            href: "start.json",
-          }, {
             default: true,
             icon: "fa-solid fa-rocket",
-            text: "Open App",
+            text: "Open Web UI",
             href: local.url,
+          }, {
+            icon: 'fa-solid fa-terminal',
+            text: "Server",
+            href: "start.json",
+          }]
+        } else {
+          return [{
+            default: true,
+            icon: 'fa-solid fa-terminal',
+            text: "Server",
+            href: "start.json",
           }]
         }
       } else if (running.update) {
         return [{
           default: true,
-          icon: "fa-solid fa-rocket",
+          icon: 'fa-solid fa-terminal',
           text: "Updating",
-          href: "update.js"
+          href: "update.js",
         }]
       } else if (running.reset) {
         return [{
           default: true,
-          icon: "fa-solid fa-rocket",
+          icon: 'fa-solid fa-terminal',
           text: "Resetting",
-          href: "reset.js"
+          href: "reset.js",
+		}]
+	  } else if (running.cache) {
+        return [{
+          default: true,
+          icon: 'fa-solid fa-terminal',
+          text: "Clearing Cache",
+          href: "delete-cache.js",
+        }]
+      } else if (running.link) {
+        return [{
+          default: true,
+          icon: 'fa-solid fa-terminal',
+          text: "Deduplicating",
+          href: "link.js",
         }]
       } else {
         return [{
+          default: true,
           icon: "fa-solid fa-power-off",
           text: "Start",
           href: "start.json",
         }, {
+          icon: "fa-solid fa-download",
+          text: "Download Models",
+          menu: [
+            { text: "Small (ARC)", icon: "fa-solid fa-download", href: "download-small-arc.json", mode: "refresh" },
+            { text: "Small (RF)", icon: "fa-solid fa-download", href: "download-small-rf.json", mode: "refresh" },
+            { text: "Medium (ARC)", icon: "fa-solid fa-download", href: "download-medium-arc.json", mode: "refresh" },
+            { text: "Medium (RF)", icon: "fa-solid fa-download", href: "download-medium-rf.json", mode: "refresh" },
+          ]
+        }, {
           icon: "fa-solid fa-rocket",
           text: "Update",
-          href: "update.js"
+          href: "update.js",
         }, {
           icon: "fa-solid fa-plug",
           text: "Install",
           href: "install.json",
         }, {
           icon: "fa-regular fa-circle-xmark",
-          text: "<div><strong>Reset</strong><div>Revert to pre-install state</div></div>",
+          text: "Reset",
           href: "reset.js",
-          confirm: "Are you sure you wish to reset the app?"
+          confirm: "Are you sure you wish to reset this app?",
         }]
       }
     } else {
