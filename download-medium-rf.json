@@ -1,19 +1,13 @@
 {
   "run": [
     {
-      "when": "{{!exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-medium-base')}}",
-      "method": "hf.download",
-      "params": {
-        "_": ["cocktailpeanut/stable-audio-3-medium-base"]
-      }
-    },
-    {
-      "when": "{{exists('cache/HF_HOME/hub/models--cocktailpeanut--stable-audio-3-medium-base') && !exists('cache/HF_HOME/hub/models--stabilityai--stable-audio-3-medium-base')}}",
+      "when": "{{!exists(path.resolve(os.homedir(), '.cache', 'huggingface', 'hub', 'models--stabilityai--stable-audio-3-medium-base'))}}",
       "method": "shell.run",
       "params": {
-        "path": "cache/HF_HOME/hub",
+        "path": "app",
+        "env": { "HF_HOME": "{{path.resolve(os.homedir(), '.cache', 'huggingface')}}" },
         "message": [
-          "node -e \"require('fs').renameSync('models--cocktailpeanut--stable-audio-3-medium-base','models--stabilityai--stable-audio-3-medium-base')\""
+          "uv run python -c \"import os,pathlib; from huggingface_hub import snapshot_download; snapshot_download('cocktailpeanut/stable-audio-3-medium-base'); h=pathlib.Path(os.environ.get('HF_HOME') or os.path.expanduser('~/.cache/huggingface'))/'hub'; s=h/'models--cocktailpeanut--stable-audio-3-medium-base'; d=h/'models--stabilityai--stable-audio-3-medium-base'; (s.rename(d) if s.exists() and not d.exists() else None)\""
         ]
       }
     }
