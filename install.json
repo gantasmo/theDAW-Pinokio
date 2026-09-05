@@ -46,7 +46,15 @@
       }
     },
     {
-      "when": "{{platform !== 'darwin'}}",
+      "when": "{{platform === 'linux'}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "message": ["uv sync --group dev || uv sync --group dev --no-install-package pyk4a-bundle"]
+      }
+    },
+    {
+      "when": "{{platform === 'win32'}}",
       "method": "shell.run",
       "params": {
         "path": "app",
@@ -54,9 +62,25 @@
       }
     },
     {
+      "when": "{{exists('app/underfit/pyproject.toml') && !exists('app/underfit/.venv')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app/underfit",
+        "message": ["uv sync --inexact"]
+      }
+    },
+    {
       "method": "shell.run",
       "params": {
         "path": "app/frontend",
+        "message": ["npm install"]
+      }
+    },
+    {
+      "when": "{{exists('app/VST-Foundry-UI/VST-UI-FOUNDRY/package.json')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app/VST-Foundry-UI/VST-UI-FOUNDRY",
         "message": ["npm install"]
       }
     },
@@ -82,7 +106,7 @@
         "path": "app",
         "env": { "HF_HOME": "{{path.resolve(os.homedir(), '.cache', 'huggingface')}}" },
         "message": [
-          "uv run python -c \"import os,pathlib; from huggingface_hub import snapshot_download; snapshot_download('cocktailpeanut/stable-audio-3-small-music'); h=pathlib.Path(os.environ.get('HF_HOME') or os.path.expanduser('~/.cache/huggingface'))/'hub'; s=h/'models--cocktailpeanut--stable-audio-3-small-music'; d=h/'models--stabilityai--stable-audio-3-small-music'; (s.rename(d) if s.exists() and not d.exists() else None)\""
+          "uv run --no-sync python -c \"import os,pathlib; from huggingface_hub import snapshot_download; snapshot_download('cocktailpeanut/stable-audio-3-small-music'); h=pathlib.Path(os.environ.get('HF_HOME') or os.path.expanduser('~/.cache/huggingface'))/'hub'; s=h/'models--cocktailpeanut--stable-audio-3-small-music'; d=h/'models--stabilityai--stable-audio-3-small-music'; (s.rename(d) if s.exists() and not d.exists() else None)\""
         ]
       }
     },
@@ -93,7 +117,7 @@
         "path": "app",
         "env": { "HF_HOME": "{{path.resolve(os.homedir(), '.cache', 'huggingface')}}" },
         "message": [
-          "uv run python -c \"import os,pathlib; from huggingface_hub import snapshot_download; snapshot_download('cocktailpeanut/stable-audio-3-medium'); h=pathlib.Path(os.environ.get('HF_HOME') or os.path.expanduser('~/.cache/huggingface'))/'hub'; s=h/'models--cocktailpeanut--stable-audio-3-medium'; d=h/'models--stabilityai--stable-audio-3-medium'; (s.rename(d) if s.exists() and not d.exists() else None)\""
+          "uv run --no-sync python -c \"import os,pathlib; from huggingface_hub import snapshot_download; snapshot_download('cocktailpeanut/stable-audio-3-medium'); h=pathlib.Path(os.environ.get('HF_HOME') or os.path.expanduser('~/.cache/huggingface'))/'hub'; s=h/'models--cocktailpeanut--stable-audio-3-medium'; d=h/'models--stabilityai--stable-audio-3-medium'; (s.rename(d) if s.exists() and not d.exists() else None)\""
         ]
       }
     }

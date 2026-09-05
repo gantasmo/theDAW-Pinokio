@@ -7,7 +7,7 @@
         "path": "app",
         "env": { "HF_HOME": "{{path.resolve(os.homedir(), '.cache', 'huggingface')}}" },
         "message": [
-          "uv run python -c \"import os,pathlib; from huggingface_hub import snapshot_download; snapshot_download('cocktailpeanut/stable-audio-3-small-music-base'); h=pathlib.Path(os.environ.get('HF_HOME') or os.path.expanduser('~/.cache/huggingface'))/'hub'; s=h/'models--cocktailpeanut--stable-audio-3-small-music-base'; d=h/'models--stabilityai--stable-audio-3-small-music-base'; (s.rename(d) if s.exists() and not d.exists() else None)\""
+          "uv run --no-sync python -c \"import os,pathlib; from huggingface_hub import snapshot_download; snapshot_download('cocktailpeanut/stable-audio-3-small-music-base'); h=pathlib.Path(os.environ.get('HF_HOME') or os.path.expanduser('~/.cache/huggingface'))/'hub'; s=h/'models--cocktailpeanut--stable-audio-3-small-music-base'; d=h/'models--stabilityai--stable-audio-3-small-music-base'; (s.rename(d) if s.exists() and not d.exists() else None)\""
         ]
       }
     }

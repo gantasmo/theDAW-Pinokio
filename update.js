@@ -17,6 +17,29 @@ module.exports = {
       path: "app"
     }
   }, {
+    // pyk4a-bundle (Azure Kinect backend for AKVJ) only ships a
+    // manylinux_2_38 wheel. On older glibc the whole sync fails on it, so
+    // retry without it, exactly like theDAW.sh and the Dockerfile do.
+    when: "{{platform === 'linux'}}",
+    method: "shell.run",
+    params: {
+      path: "app",
+      message: [
+        "uv sync --group dev || uv sync --group dev --no-install-package pyk4a-bundle"
+      ]
+    }
+  }, {
+    when: "{{platform === 'darwin'}}",
+    method: "shell.run",
+    params: {
+      path: "app",
+      env: { "CFLAGS": "-Wno-incompatible-function-pointer-types" },
+      message: [
+        "uv sync --group dev"
+      ]
+    }
+  }, {
+    when: "{{platform === 'win32'}}",
     method: "shell.run",
     params: {
       path: "app",
@@ -25,9 +48,29 @@ module.exports = {
       ]
     }
   }, {
+    // The Underfit trainer tab has its own venv (~2.5 GB of torch). Only
+    // re-sync it when a previous Install or the app's self-repair built it.
+    when: "{{exists('app/underfit/pyproject.toml') && exists('app/underfit/.venv')}}",
+    method: "shell.run",
+    params: {
+      path: "app/underfit",
+      message: [
+        "uv sync --inexact"
+      ]
+    }
+  }, {
     method: "shell.run",
     params: {
       path: "app/frontend",
+      message: [
+        "npm install"
+      ]
+    }
+  }, {
+    when: "{{exists('app/VST-Foundry-UI/VST-UI-FOUNDRY/package.json')}}",
+    method: "shell.run",
+    params: {
+      path: "app/VST-Foundry-UI/VST-UI-FOUNDRY",
       message: [
         "npm install"
       ]

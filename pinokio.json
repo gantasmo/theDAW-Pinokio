@@ -1,6 +1,6 @@
 {
   "title": "theDAW",
-  "description": "All-in-one AI music studio by GANTASMO. Stable Audio 3 and Magenta RealTime 2 generation, Chimera multi-track fusion, Demucs stems, MIDI and notation, DJ and VJ rigs, DAW project import, VST3 and .gan plugins, and a RAG-backed in-app assistant.",
+  "description": "All-in-one AI music studio by GANTASMO. Stable Audio 3 and Magenta RealTime 2 generation, Chimera v2 multi-track fusion, Demucs stems, MIDI, notation and SCORE play-along, the NodeF.I. node editor, DJ, VJ and Sway Perform rigs, DAW project import, VST3 and .gan plugins, the Underfit LoRA trainer, and a RAG-backed in-app assistant.",
   "icon": "icon.png",
   "links": [
     {
