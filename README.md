@@ -55,6 +55,7 @@ The other Stable Audio 3 checkpoints are one click away under **Download Models*
 | **DJ** | Two decks with beat sync, key lock, hotcues, loops, live stems, an FX rack, a sampler, and Automix that plays prepared performance sets and takes instructions from the assistant mid-show. |
 | **VJ** | The [VJ-9000](https://github.com/gantasmo/VJ-9000) visual engine: audio-reactive terrain, cameras, GLSL shaders, cymatics, a GPU effect chain, and recording. |
 | **LOOM** | A living colony of loops cut from your own library. Cells grow, divide and wither on the beat clock, and the graph rewires itself while it plays. |
+| **SWAY** | The SwayCommand gesture cockpit: scenes, a timeline and gesture axes bound to macros, driven by a camera or the Audima Sway. |
 | **PERFORM** | Launch scenes and clips from a grid. Opens Ableton sets and `.tasmo` projects. Pad effects and controller routing. |
 | **FOUNDRY** | Design a plugin interface on a canvas and export it as a `.gan` web-plugin. |
 | **NODEFI** | Connect generation, effects and library nodes into a graph. Run it as a pipeline or play it live. |
@@ -93,11 +94,10 @@ Drag clips along a track or onto another track with the Move tool. Split a clip 
 Add effects from the EFFECTS list to the CHAIN. Audio flows through the chain from left to right. The 25 effects cover mastering, compression, filters, vocal processing, lo-fi, stereo widening, reverb, delay, LUFS normalization and pitch shift, and each one opens its own control panel. The four QUICK MASTER knobs (PUNCH, AIR, DRIVE, CEIL) set the most common mastering moves in one place. VST3 plugins found in the standard plugin folders appear in the same list, and `.gan` web-plugins open in the effect stage. Press PROCESS CHAIN to render.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/owl.png" alt="The Owl: the HRTF spatializer with the azimuth and elevation pad, the room pad and the source positions" width="410">
-  <img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/ares.png" alt="Ares: a multi-effect with filter, delay, reverb, grains and gate around a node display" width="410">
+  <img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/owl.png" alt="The Owl: the HRTF spatializer with the azimuth and elevation pad, the room pad and the source positions" width="640">
 </p>
 
-<sub align="center">The Owl and Ares are <code>.gan</code> web-plugins included with theDAW. Any FOUNDRY design exports to the same format.</sub>
+<sub align="center">The Owl is a <code>.gan</code> web-plugin included with theDAW, alongside the Ares multi-effect shown under FOUNDRY below. Any FOUNDRY design exports to the same format.</sub>
 
 ### Turn audio into sheet music: SCORE
 
@@ -146,9 +146,21 @@ Open an Ableton set or a `.tasmo` project in the OPEN field. Each column is a tr
 
 ### Design a plugin interface: FOUNDRY
 
-<p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/foundry.png" alt="The Foundry canvas with the Ares plugin face open: its knobs on the canvas and its layers listed" width="820"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/foundry-ares.png" alt="The Foundry canvas in edit mode with the Ares plugin face open, its controls live on the canvas and the AI design panel alongside" width="900"></p>
 
-Drag knobs, sliders, meters, buttons, displays and images from the left palette. Upload a background image or pick a texture. OPEN .GAN opens an existing plugin to edit, such as the included Ares shown above. DEMO MODE switches between editing the controls and operating them. EXPORT CODE and PACKAGE write the design as a `.gan` web-plugin, GANTASMO's plugin format, which loads in the MIX chain next to VST3 plugins and the built-in effects.
+Shown above with the included Ares multi-effect open as an editable design. Drag knobs, sliders, meters, buttons, displays and images from the left palette, or describe what you want to the AI panel on the right and let it place and style them. Upload a background image or pick a texture. OPEN .GAN opens an existing plugin to edit, such as the included Ares shown above. DEMO MODE switches between editing the controls and operating them. EXPORT CODE and PACKAGE write the design as a `.gan` web-plugin, GANTASMO's plugin format, which loads in the MIX chain next to VST3 plugins and the built-in effects.
+
+### Grow a colony of loops: LOOM
+
+<p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/loom.png" alt="The LOOM dish: seventeen cells, nested colonies drawn as glass bubbles, tendril wires and polymetric labels" width="900"></p>
+
+Every song in the library is torn into bar- and beat-aligned fragments of each stem, indexed with its key, energy, rhythm, chords and words. LOOM plays that index as one dish that grows while it runs. It starts as a single spore you click; from there cells divide on the beat (a child is born on its parent at zero vitality and ripens over three bars), colonies form around existing loops, and idle cells are hollowed out over two bars and removed. Loops, rules, gates and mods wire to each other with rope-physics tendrils, and a colony is itself a cell with its own meter, so 7/8 grouped 3+2+2 can run inside a 4/4 dish at half speed.
+
+### Conduct it with your hands: SWAY
+
+<p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/sway.png" alt="The SwayCommand cockpit: the scene list, the timeline, and gesture axes bound to macro knobs and named pads" width="900"></p>
+
+SWAY embeds the [SwayCommand](https://github.com/danieljtrujillo/SwayCommand) cockpit whole: scenes down the left, a timeline underneath, and gesture axes (X, Y, PULSE, PRESS, SWAY) bound to macro knobs and named pads. Move in front of a camera, or move the Audima Sway motion controller, and you are playing those controls. theDAW owns the only `requestMIDIAccess()` in the app and relays hardware into the cockpit, so a controller you plug in reaches it with no extra setup.
 
 ### Connect nodes: NODEFI
 
@@ -198,6 +210,12 @@ The library is on disk under `app/data`, with its metadata in `app/data/library.
 - **SCORE**, **SING** and **DETAILS** show the selected song's notation, lyrics and metadata.
 - **MEDIA** holds dropped files and URL imports (YouTube and SoundCloud) before they go to a tab or the library.
 - **SLIDE** is a touch control surface. **SWAY** controls music from camera-tracked movement.
+
+### Book the road: TOUR
+
+<p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/tour.png" alt="The TOUR tab: 513 Austin venues plotted on the map with the venue list, addresses and booking contacts" width="900"></p>
+
+Search a city and TOUR returns the venues in it — 513 for Austin above — each with its type, address, and the website, email and phone to book it. Add the ones you want as stops and it works out the drive between them, with EV charging stops if that is what you drive.
 
 ### Controllers, XR and phone
 
