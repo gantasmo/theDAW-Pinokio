@@ -1,6 +1,6 @@
 # theDAW (Pinokio launcher)
 
-One-click launcher for [theDAW](https://github.com/gantasmo/theDAW), the all-in-one AI music studio by GANTASMO. theDAW combines Stable Audio 3 and Magenta RealTime 2 generation, the Chimera v2 multi-track fusion engine, Demucs stem separation, MIDI and notation tooling with SCORE play-along and drum transcription, the NodeF.I. node editor, DJ, VJ and Sway Perform rigs, DAW project import (Ableton Live, Reaper, FL Studio, Audition, Bitwig, Resolume), VST3 and .gan plugin hosting, the Underfit LoRA trainer, and a RAG-backed in-app assistant.
+One-click launcher for [theDAW](https://github.com/gantasmo/theDAW), the all-in-one AI music studio by GANTASMO. theDAW combines Stable Audio 3 and Magenta RealTime 2 generation, the Chimera v2 multi-track fusion engine, Demucs stem separation, MIDI and notation tooling with SCORE play-along and drum transcription, the NodeF.I. node editor, DJ, VJ and Sway Perform rigs, DAW project import (Ableton Live, Reaper, FL Studio, Audition, Bitwig, Resolume), VST3 and .gan plugin hosting, the Underfit LoRA trainer, the LOOM shard weaver (live-coded, beat-clocked resampling of your own library), and a RAG-backed in-app assistant.
 
 ## What the launcher does
 
