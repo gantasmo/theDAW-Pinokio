@@ -1,6 +1,6 @@
 {
   "title": "theDAW",
-  "description": "All-in-one AI music studio by GANTASMO. Stable Audio 3 and Magenta RealTime 2 generation, Chimera v2 multi-track fusion, Demucs stems, MIDI, notation and SCORE play-along, the NodeF.I. node editor, DJ, VJ and Sway Perform rigs, DAW project import, VST3 and .gan plugins, the Underfit LoRA trainer, the LOOM colony (a living graph of loops cut from your own library that grows, divides and withers on the beat clock), and a RAG-backed in-app assistant.",
+  "description": "Full-featured DAW, DJ, and VJ app interoperable w/Ableton, Reaper, Resolume & more. Stable Audio 3, Magenta RT2, Lyria 3 Pro, Suno API, Chimera track fusion, Demucs stems, MIDI generate/notate, native Audima Labs Sway support, img > spectrogram > music, drawing > music, VST3 & .gan plugins, automix & key-lock, GLSL shaders, volumetric video, Quest 3 XR interface, MIDI auto-map, RAG assistant",
   "icon": "icon.png",
   "links": [
     {
