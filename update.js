@@ -5,6 +5,21 @@ module.exports = {
       message: "git pull"
     }
   }, {
+    // `npm install` (frontend, electron-ui) and `uv sync` rewrite tracked
+    // lockfiles on an ordinary run, so a clone that has only ever been
+    // launched still looks modified to git and the pull below died with
+    //   error: Your local changes to the following files would be
+    //   overwritten by merge
+    // with nothing the user could do about it from inside Pinokio. This clone
+    // is launcher-managed, so discarding tracked-file edits is the right call;
+    // untracked content -- data/, .venv, node_modules, downloaded models --
+    // is never touched by it.
+    method: "shell.run",
+    params: {
+      message: "git checkout -- .",
+      path: "app"
+    }
+  }, {
     method: "shell.run",
     params: {
       message: "git pull",

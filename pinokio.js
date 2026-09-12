@@ -142,6 +142,12 @@ module.exports = {
           text: "Reset",
           href: "reset.js",
           confirm: "Are you sure you wish to reset this app?",
+        }, {
+          // theDAW is independent and self-funded; same destination as the
+          // Sponsor row in the app's hamburger menu and Settings footer.
+          icon: "fa-solid fa-heart",
+          text: "Sponsor",
+          href: "https://github.com/sponsors/gantasmo",
         }]
       }
     } else {
@@ -150,6 +156,10 @@ module.exports = {
         icon: "fa-solid fa-plug",
         text: "Install",
         href: "install.json",
+      }, {
+        icon: "fa-solid fa-heart",
+        text: "Sponsor",
+        href: "https://github.com/sponsors/gantasmo",
       }]
     }
   }
