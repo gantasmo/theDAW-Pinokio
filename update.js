@@ -104,5 +104,18 @@ module.exports = {
         "npm install"
       ]
     }
+  }, {
+    // npm 11 warns about dependencies whose install scripts have not been
+    // reviewed, and npm 12 will BLOCK them. theDAW records its own approvals
+    // in frontend/package.json and electron-ui/package.json; VJ-9000 is a
+    // separate repository, so its approvals are written into the clone here.
+    // Tolerant on purpose: an npm without the command must not fail Update.
+    method: "shell.run",
+    params: {
+      path: "app/vj",
+      message: [
+        "npm approve-scripts --all --no-allow-scripts-pin || echo skipped: this npm has no approve-scripts"
+      ]
+    }
   }]
 }

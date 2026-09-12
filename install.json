@@ -25,10 +25,20 @@
       }
     },
     {
+      "when": "{{platform === 'win32'}}",
       "method": "shell.run",
       "params": {
         "message": [
-          "conda install -y -c conda-forge ffmpeg"
+          "where ffmpeg >nul 2>&1 || conda install -y -c conda-forge ffmpeg"
+        ]
+      }
+    },
+    {
+      "when": "{{platform !== 'win32'}}",
+      "method": "shell.run",
+      "params": {
+        "message": [
+          "command -v ffmpeg >/dev/null 2>&1 || conda install -y -c conda-forge ffmpeg"
         ]
       }
     },
@@ -104,6 +114,13 @@
       "params": {
         "path": "app/vj",
         "message": ["npm install"]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app/vj",
+        "message": ["npm approve-scripts --all --no-allow-scripts-pin || echo skipped: this npm has no approve-scripts"]
       }
     },
     {
