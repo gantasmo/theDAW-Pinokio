@@ -244,11 +244,11 @@ The Python dependency set self-selects per platform through `uv`:
 
 | Platform | Torch build | Notes |
 |---|---|---|
-| Windows | CUDA 12.8 wheels + prebuilt flash-attention | Full feature set. Flash-attention is enabled only on Ampere or newer GPUs; Turing cards (RTX 20xx, GTX 16xx) fall back to standard attention automatically. |
-| Linux x86_64 | CUDA 12.6 wheels | Full feature set; Magenta sidecar supported. On glibc older than 2.38 the Azure Kinect backend (`pyk4a-bundle`) is skipped and only the Kinect point-cloud source is lost. |
+| Windows | CUDA 13 wheels (torch 2.14) + prebuilt flash-attention | Full feature set. Flash-attention is enabled only on Ampere or newer GPUs; Turing cards (RTX 20xx, GTX 16xx) fall back to standard attention automatically. |
+| Linux x86_64 | CUDA 13 wheels (torch 2.14) | Full feature set; Magenta sidecar supported. On glibc older than 2.38 the Azure Kinect backend (`pyk4a-bundle`) is skipped and only the Kinect point-cloud source is lost. |
 | macOS | Standard PyPI torch (CPU / MPS) | Small model recommended; flash-attention, Azure Kinect, and the Magenta sidecar are skipped automatically. |
 
-The Small generation model runs on CPU, so machines without an NVIDIA GPU still generate audio. The Medium model, Magenta, Demucs and GPU whisper want an NVIDIA driver of 550 or newer.
+The Small generation model runs on CPU, so machines without an NVIDIA GPU still generate audio. The Medium model, Magenta, Demucs and GPU whisper want an NVIDIA driver of 580 or newer: the torch build is a CUDA 13 wheel, which needs the R580 driver branch.
 
 ## Themes and layout
 

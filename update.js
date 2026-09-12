@@ -17,6 +17,15 @@ module.exports = {
       path: "app"
     }
   }, {
+    // The app ships its git hooks in .githooks (ruff on every commit, the
+    // cross-platform lock check). theDAW.bat / theDAW.sh set this on every
+    // launch; the launcher sets it on every Install and Update instead.
+    method: "shell.run",
+    params: {
+      message: "git config core.hooksPath .githooks",
+      path: "app"
+    }
+  }, {
     // pyk4a-bundle (Azure Kinect backend for AKVJ) only ships a
     // manylinux_2_38 wheel. On older glibc the whole sync fails on it, so
     // retry without it, exactly like theDAW.sh and the Dockerfile do.

@@ -20,6 +20,13 @@
     {
       "method": "shell.run",
       "params": {
+        "path": "app",
+        "message": ["git config core.hooksPath .githooks"]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
         "message": [
           "conda install -y -c conda-forge ffmpeg"
         ]
