@@ -2,6 +2,16 @@
   "daemon": true,
   "run": [
     {
+      "when": "{{exists('app/backend/ports.py')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "message": [
+          "uv run --no-sync python -m backend.ports --free"
+        ]
+      }
+    },
+    {
       "method": "shell.run",
       "params": {
         "path": "app",
