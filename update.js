@@ -132,5 +132,56 @@ module.exports = {
         "npm approve-scripts --all --no-allow-scripts-pin || echo skipped: this npm has no approve-scripts"
       ]
     }
+  }, {
+    // The SWAY tab is served from a compiled SwayCommand cockpit, and that
+    // build is not committed to the repo -- so a Pinokio install had no way to
+    // get one and the tab was empty on every source install. The repo is
+    // public, the build needs two packages and about a second, so the launcher
+    // makes it here. theDAW resolves <launcher>/SwayCommand/dist-embed by
+    // itself (backend/modules/sway/sidecar.py), so nothing is copied or
+    // configured afterwards.
+    when: "{{!exists('SwayCommand')}}",
+    method: "shell.run",
+    params: {
+      message: [
+        "git clone --depth 1 https://github.com/danieljtrujillo/SwayCommand SwayCommand"
+      ]
+    }
+  }, {
+    // Shallow clone: fetch + reset rather than pull, so a force-push upstream
+    // cannot leave Update stuck on a merge it can never do.
+    method: "shell.run",
+    params: {
+      path: "SwayCommand",
+      message: [
+        "git fetch --depth 1 origin main"
+      ]
+    }
+  }, {
+    method: "shell.run",
+    params: {
+      path: "SwayCommand",
+      message: [
+        "git reset --hard FETCH_HEAD"
+      ]
+    }
+  }, {
+    // --no-save: the bundler needs esbuild and three, and the clone stays
+    // clean, so the fetch/reset above never collides with a dirtied manifest.
+    method: "shell.run",
+    params: {
+      path: "SwayCommand",
+      message: [
+        "npm install --no-save --no-audit --no-fund esbuild three"
+      ]
+    }
+  }, {
+    method: "shell.run",
+    params: {
+      path: "SwayCommand",
+      message: [
+        "npm run build:renderer:embed"
+      ]
+    }
   }]
 }

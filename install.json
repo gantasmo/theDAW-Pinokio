@@ -124,6 +124,27 @@
       }
     },
     {
+      "when": "{{!exists('SwayCommand')}}",
+      "method": "shell.run",
+      "params": {
+        "message": ["git clone --depth 1 https://github.com/danieljtrujillo/SwayCommand SwayCommand"]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "SwayCommand",
+        "message": ["npm install --no-save --no-audit --no-fund esbuild three"]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "SwayCommand",
+        "message": ["npm run build:renderer:embed"]
+      }
+    },
+    {
       "when": "{{platform === 'darwin' && !exists(path.resolve(os.homedir(), '.cache', 'huggingface', 'hub', 'models--stabilityai--stable-audio-3-small-music'))}}",
       "method": "shell.run",
       "params": {
