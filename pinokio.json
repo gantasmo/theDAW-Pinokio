@@ -1,6 +1,6 @@
 {
   "title": "theDAW",
-  "description": "Full-featured DAW, DJ, and VJ app interoperable w/Ableton, Reaper, Resolume & more. Stable Audio 3, Magenta RT2, Lyria 3 Pro, Suno API, Chimera track fusion, Demucs stems, MIDI generate/notate, native Audima Labs Sway support, img > spectrogram > music, drawing > music, VST3 & .gan plugins, automix & key-lock, GLSL shaders, volumetric video, Quest 3 XR interface, MIDI auto-map, RAG assistant",
+  "description": "Full-featured DAW, DJ, and VJ app interoperable w/Ableton, Reaper, Resolume & more. Stable Audio 3, Magenta RT2, Lyria 3 Pro, Suno API, Chimera track fusion, Demucs stems, MIDI generate/notate, native Audima Labs Sway support, img > spectrogram > music, drawing > music, VST3 & .gan plugins, automix & key-lock, GLSL shaders, volumetric video, Quest 3 XR interface, MIDI auto-map, RAG assistant, asset library with example projects",
   "icon": "icon.png",
   "links": [
     {

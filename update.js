@@ -6,23 +6,25 @@ module.exports = {
     }
   }, {
     // `npm install` (frontend, electron-ui) and `uv sync` rewrite tracked
-    // lockfiles on an ordinary run, so a clone that has only ever been
-    // launched still looks modified to git and the pull below died with
+    // lockfiles on an ordinary run, and a clone can carry a local commit, so
+    // `git pull` here died with either
     //   error: Your local changes to the following files would be
     //   overwritten by merge
+    // or, from Pinokio's own git (2.33+, no pull.rebase configured),
+    //   fatal: Need to specify how to reconcile divergent branches.
     // with nothing the user could do about it from inside Pinokio. This clone
-    // is launcher-managed, so discarding tracked-file edits is the right call;
-    // untracked content -- data/, .venv, node_modules, downloaded models --
-    // is never touched by it.
+    // is launcher-managed, so it is moved onto the published main with a fetch
+    // and a hard reset. Untracked and ignored content -- data/, vj/, .venv,
+    // node_modules, downloaded models -- is never touched by either command.
     method: "shell.run",
     params: {
-      message: "git checkout -- .",
+      message: "git fetch origin main",
       path: "app"
     }
   }, {
     method: "shell.run",
     params: {
-      message: "git pull",
+      message: "git reset --hard FETCH_HEAD",
       path: "app"
     }
   }, {
