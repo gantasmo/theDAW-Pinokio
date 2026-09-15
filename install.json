@@ -134,6 +134,20 @@
       "method": "shell.run",
       "params": {
         "path": "SwayCommand",
+        "message": ["git fetch --depth 1 origin main"]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "SwayCommand",
+        "message": ["git reset --hard FETCH_HEAD"]
+      }
+    },
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "SwayCommand",
         "message": ["npm install --no-save --no-audit --no-fund esbuild three"]
       }
     },

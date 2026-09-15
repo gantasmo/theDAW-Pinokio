@@ -29,9 +29,9 @@ Install and Start below handle the whole stack: Python, CUDA, FFmpeg, the fronte
 
 ## What the launcher does
 
-- **Install** clones the repo into `app/`, pulls the Magenta sidecar submodule, installs FFmpeg through conda, resolves all Python dependencies with `uv sync --group dev`, builds the optional Underfit trainer environment, installs the frontend and VST Foundry packages with `npm install`, clones the VJ-9000 app, clones and builds the SwayCommand cockpit for the SWAY tab, and pre-fetches the default generation model from the public mirror (Medium on Windows and Linux, Small on macOS) so the first CREATE does not wait on a download.
+- **Install** clones the repo into `app/`, pulls the Magenta sidecar submodule, installs FFmpeg through conda, resolves all Python dependencies with `uv sync --group dev`, builds the optional Underfit trainer environment, installs the frontend and VST Foundry packages with `npm install`, clones the VJ-9000 app, clones or refreshes the SwayCommand cockpit for the SWAY tab and builds it, and pre-fetches the default generation model from the public mirror (Medium on Windows and Linux, Small on macOS) so the first CREATE does not wait on a download.
 - **Start** launches the FastAPI backend through its restart supervisor on `http://localhost:8600`, then the Vite frontend on `http://localhost:5173`, and opens the app once the URL appears. Settings → Restart Server works under the launcher: the backend comes back inside the same Pinokio terminal.
-- **Update** pulls the launcher and the app repos, refreshes the submodule, re-syncs the Python, Underfit and npm dependencies, re-provisions the VJ app if it is missing, and rebuilds the SwayCommand cockpit.
+- **Update** pulls the launcher, moves the app clone onto the published `main` with a fetch and a hard reset so a lockfile the last run rewrote cannot block it, refreshes the submodule, re-syncs the Python, Underfit and npm dependencies, re-provisions the VJ app if it is missing, and refreshes and rebuilds the SwayCommand cockpit. Untracked content stays put: `app/data`, `app/vj`, the venvs, `node_modules` and the downloaded models.
 - **Reset** deletes the dependency trees only: `app/.venv`, `app/underfit/.venv`, and the `node_modules` folders of the frontend, VST Foundry and VJ app. Your library, settings and generated audio under `app/data` stay put. The next Install rebuilds the dependencies from clean.
 
 The other Stable Audio 3 checkpoints are one click away under **Download Models** (Small ARC, Small RF, Medium ARC, Medium RF), and theDAW also downloads any model the first time a generation needs it. The launcher points `HF_HOME` at the standard user Hugging Face cache (`~/.cache/huggingface`) rather than an isolated per-app cache, so checkpoints and the Hugging Face auth token already on the machine are reused. The official Stable Audio 3 and t5gemma repos are gated; the app falls back to a public mirror of the same weights automatically, and a Hugging Face token (the in-app sign-in, or `hf auth login`) unlocks the official repos.
@@ -56,7 +56,7 @@ The other Stable Audio 3 checkpoints are one click away under **Download Models*
 | **DJ** | Two decks with beat sync, key lock, hotcues, loops, live stems, an FX rack, a sampler, and Automix that plays prepared performance sets and takes instructions from the assistant mid-show. |
 | **VJ** | The [VJ-9000](https://github.com/gantasmo/VJ-9000) visual engine: audio-reactive terrain, cameras, GLSL shaders, cymatics, a GPU effect chain, and recording. |
 | **LOOM** | A living colony of loops cut from your own library. Cells divide, envelop and wither on the beat clock while it plays. |
-| **SWAY** | The SwayCommand gesture cockpit: scenes, a timeline and gesture axes bound to macros, driven by a camera or the Audima Sway. |
+| **SWAY** | The SwayCommand gesture cockpit: scenes, a timeline and gesture axes bound to macros, driven by a camera or the Audima Labs Sway. |
 | **PERFORM** | Launch scenes and clips from a grid. Opens Ableton sets and `.tasmo` projects. Pad effects and controller routing. |
 | **FOUNDRY** | Design a plugin interface on a canvas and export it as a `.gan` web-plugin. |
 | **NODEFI** | Connect generation, effects and library nodes into a graph. Run it as a pipeline or play it live. |
@@ -66,7 +66,7 @@ The other Stable Audio 3 checkpoints are one click away under **Download Models*
 
 **Included at no cost.** Stem separation up to 12 stems, a mastering suite, VST3 hosting, the HRTF spatializer The Owl, DJ decks with sync and Automix, audio-to-MIDI with engraving, LoRA training, forced-aligned lyrics with a whisper review, a rhyme and literary reading of any lyric, and export to WAV, MP3, FLAC, OGG, AIFF, Opus, M4A, MIDI, MusicXML and LRC. Every model in that list runs on the GPU when there is one, one at a time, and never twice for the same song.
 
-**Only in theDAW.** [theDAW-XR](https://github.com/gantasmo/theDAW-XR) hand-tracked control on Meta Quest 3, Chimera clip fusion, DRAW (draw on a canvas to play generative music), native Audima Sway motion-controller support, The Foundry plugin designer, import of Ableton, Reaper, FL Studio, Audacity, Audition, Bitwig and Resolume projects, the first non-Mac port of Magenta RealTime 2, and 28 themes plus a custom theme built from any image.
+**Only in theDAW.** [theDAW-XR](https://github.com/gantasmo/theDAW-XR) hand-tracked control on Meta Quest 3, Chimera clip fusion, DRAW (draw on a canvas to play generative music), native Audima Labs Sway motion-controller support, The Foundry plugin designer, import of Ableton, Reaper, FL Studio, Audacity, Audition, Bitwig and Resolume projects, the first non-Mac port of Magenta RealTime 2, and 28 themes plus a custom theme built from any image.
 
 ---
 
@@ -169,7 +169,7 @@ Every song in the library is torn into bar- and beat-aligned fragments of each s
 
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/sway.png" alt="The SwayCommand cockpit: the scene list, the timeline, and gesture axes bound to macro knobs and named pads" width="900"></p>
 
-SWAY embeds the [SwayCommand](https://github.com/danieljtrujillo/SwayCommand) cockpit whole: scenes down the left, a timeline underneath, and gesture axes (X, Y, PULSE, PRESS, SWAY) bound to macro knobs and named pads. Move in front of a camera, or move the Audima Sway motion controller, and you are playing those controls. theDAW owns the only `requestMIDIAccess()` in the app and relays hardware into the cockpit, so a controller you plug in reaches it with no extra setup.
+SWAY embeds the [SwayCommand](https://github.com/danieljtrujillo/SwayCommand) cockpit whole: scenes down the left, a timeline underneath, and gesture axes (X, Y, PULSE, PRESS, SWAY) bound to macro knobs and named pads. Move in front of a camera, or move the Audima Labs Sway motion controller, and you are playing those controls. theDAW owns the only `requestMIDIAccess()` in the app and relays hardware into the cockpit, so a controller you plug in reaches it with no extra setup.
 
 ### Connect nodes: NODEFI
 
@@ -201,6 +201,18 @@ LEARN draws every track and the links between them as a 3D graph, a 2D graph, or
 
 The library is on disk under `app/data`, with its metadata in `app/data/library.db`. Every generated track is saved with its prompt, model and settings. Imported tracks keep their lyrics and tags. Sub-tabs list a track's STEMS, MIDI, VIDEO and SCORE files. SUGGEST orders tracks into a playlist by Camelot key and BPM. The Catalogue is the full-width view of the same library with an inspector, spectrograms on demand and a lineage panel.
 
+theDAW remembers every path it writes. A file it installs, saves, downloads or exports is registered, so pickers open in the folder you last used for that kind of file, a Recent list hands the file straight back, and Show in Folder opens it in the file manager. Saving goes through the native Save As dialog.
+
+### Write and shape MIDI: the piano roll
+
+Right-click a track and choose **Convert to MIDI**, or draw notes in by hand. The roll plays what you write and sends it to the EDIT timeline.
+
+The roll carries a meter map, so the time signature can change across one piece, with additive groupings like 7/8 as 2+2+3 and a pickup bar before the first full bar. Polymeter lanes each run their own meter and loop length against the same clock. A pitch bend lane sits under the keys with a semitone range and LINE, HOLD and CURVE point shapes.
+
+The SHAPE row under the roll transforms what is there: harmony, ragtime, runs, polyrhythm and humanize, each with syncopation and accent amounts. **MATCH** pulls a song's meter map, tempo and lanes from its rhythm analysis. **GEN** writes LOOM generator rules into the active lane. **ARP** writes a chord-progression arpeggio. CAPTURE, SONG and FORM assemble a multi-section arrangement from intro to outro. A microphone turns a sung line into notes, and an AI compose flyout writes a piano part from a key and mode.
+
+It reads MusicXML, ABC, Humdrum and MIDI, taking time signatures and tempo maps from MIDI files, and writes MIDI back out with the roll's own tempo and meters.
+
 ### The bottom panel
 
 <p align="center">
@@ -213,7 +225,7 @@ The library is on disk under `app/data`, with its metadata in `app/data/library.
 
 - **LEVELS** meters loudness, true peak, dynamics and stereo image against a delivery target.
 - **VISUALIZE** shows an oscilloscope, a spectrum or a radial view.
-- **MIDI** is a piano roll. It imports and exports MIDI and sends notes to the EDIT timeline.
+- **MIDI** is the piano roll described above: meter maps, polymeter lanes, a pitch bend lane and the SHAPE transforms.
 - **SEQUENCE** is a step sequencer with 16 steps per voice.
 - **DRAW** plays generative music from strokes on a canvas.
 - **SCORE**, **SING** and **DETAILS** show the selected song's notation, lyrics and metadata.
@@ -229,9 +241,13 @@ Search a city and TOUR returns the venues in it, 513 for Austin above, each with
 
 ### Controllers, XR and phone
 
-Controller recognition knows about 110 device profiles, detects a connected controller, learns one by capture, and **Controller Vision** identifies a controller from a photo. The Audima Sway motion controller works natively. [theDAW-XR](https://github.com/gantasmo/theDAW-XR) turns a Meta Quest 3 into a hands-only controller with hand-tracked MIDI, passthrough video into VJ and co-located multiplayer. A phone web app pairs with the desktop for remote MAKE, transport, DJ and library control.
+Controller recognition knows about 110 device profiles, detects a connected controller, learns one by capture, and **Controller Vision** identifies a controller from a photo. The Audima Labs Sway motion controller works natively. [theDAW-XR](https://github.com/gantasmo/theDAW-XR) turns a Meta Quest 3 into a hands-only controller with hand-tracked MIDI, passthrough video into VJ and co-located multiplayer. A phone web app pairs with the desktop for remote MAKE, transport, DJ and library control.
 
-### Assistant
+### Footer, log and assistant
+
+The footer is on every tab with transport, a seek bar, volume and download. A track menu key opens every audio action for the loaded track, grouped, with a row per stem that sends that stem to EDIT, the init slot, the inpaint slot or the Chimera stack. The action key beside it changes with the tab (CREATE, EDIT, TRAIN, MIX, DJ), showing a progress fill while the job runs and cancelling it on a second press. Repeat is off, all or one; an output picker chooses the audio device; a Master FX chip is reachable from any tab; Ctrl+S saves the project.
+
+Status notices go to the processing log and to the assistant orb's speech bubble. The log keeps the last 500 entries, filters to errors only, and carries a live GPU, VRAM, CPU and RAM readout.
 
 The assistant orb streams chat from any configured provider (Claude Code over the CLI, Gemini, Anthropic, OpenAI, Grok, Groq, OpenRouter, Ollama, LM Studio, llama.cpp, vLLM), accepts attachments, and answers questions from theDAW's own documentation through a RAG index. Point it at Ollama or LM Studio and the assistant stays local too.
 
