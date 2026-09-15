@@ -29,9 +29,9 @@ Install and Start below handle the whole stack: Python, CUDA, FFmpeg, the fronte
 
 ## What the launcher does
 
-- **Install** clones the repo into `app/`, pulls the Magenta sidecar submodule, installs FFmpeg through conda, resolves all Python dependencies with `uv sync --group dev`, builds the optional Underfit trainer environment, installs the frontend and VST Foundry packages with `npm install`, clones the VJ-9000 app, and pre-fetches the default generation model from the public mirror (Medium on Windows and Linux, Small on macOS) so the first CREATE does not wait on a download.
+- **Install** clones the repo into `app/`, pulls the Magenta sidecar submodule, installs FFmpeg through conda, resolves all Python dependencies with `uv sync --group dev`, builds the optional Underfit trainer environment, installs the frontend and VST Foundry packages with `npm install`, clones the VJ-9000 app, clones and builds the SwayCommand cockpit for the SWAY tab, and pre-fetches the default generation model from the public mirror (Medium on Windows and Linux, Small on macOS) so the first CREATE does not wait on a download.
 - **Start** launches the FastAPI backend through its restart supervisor on `http://localhost:8600`, then the Vite frontend on `http://localhost:5173`, and opens the app once the URL appears. Settings → Restart Server works under the launcher: the backend comes back inside the same Pinokio terminal.
-- **Update** pulls the launcher and the app repos, refreshes the submodule, re-syncs the Python, Underfit and npm dependencies, and re-provisions the VJ app if it is missing.
+- **Update** pulls the launcher and the app repos, refreshes the submodule, re-syncs the Python, Underfit and npm dependencies, re-provisions the VJ app if it is missing, and rebuilds the SwayCommand cockpit.
 - **Reset** deletes the dependency trees only: `app/.venv`, `app/underfit/.venv`, and the `node_modules` folders of the frontend, VST Foundry and VJ app. Your library, settings and generated audio under `app/data` stay put. The next Install rebuilds the dependencies from clean.
 
 The other Stable Audio 3 checkpoints are one click away under **Download Models** (Small ARC, Small RF, Medium ARC, Medium RF), and theDAW also downloads any model the first time a generation needs it. The launcher points `HF_HOME` at the standard user Hugging Face cache (`~/.cache/huggingface`) rather than an isolated per-app cache, so checkpoints and the Hugging Face auth token already on the machine are reused. The official Stable Audio 3 and t5gemma repos are gated; the app falls back to a public mirror of the same weights automatically, and a Hugging Face token (the in-app sign-in, or `hf auth login`) unlocks the official repos.
@@ -51,10 +51,11 @@ The other Stable Audio 3 checkpoints are one click away under **Download Models*
 | **EDIT** | A multitrack timeline. Cut, move and fade clips, record automation, add insert effects per track, and render the arrangement to a WAV file. |
 | **MIX** | Mastering and effects. A chain of 25 effects, each with its own control panel, Quick Master knobs, VST3 plugins, `.gan` web-plugins and LUFS metering. |
 | **SCORE** | Audio to MIDI to notation. Sheet music, tablature, arrangements, drum notation, and four play-along views that follow the track. Exports a Beat Saber level. |
-| **SING** | Lyrics that follow the song word by word. Paste lyrics and a forced aligner times every word against the vocal, or tap the timing yourself. Imports and exports LRC. Scores your pitch. |
+| **SING** | Lyrics that follow the song word by word. Paste lyrics and a forced aligner times every word against the vocal, or tap the timing yourself. Imports and exports LRC. Scores your pitch. Puts the score, or a reading of the lyric's rhyme scheme and literary devices, beside the words. |
+| **LYRIC** | A notebook for lyrics that belong to no song yet. Write with syllable counts and rhyme classes in the gutter, the analysis reading along beside you, and save a draft into a song when it is ready. |
 | **DJ** | Two decks with beat sync, key lock, hotcues, loops, live stems, an FX rack, a sampler, and Automix that plays prepared performance sets and takes instructions from the assistant mid-show. |
 | **VJ** | The [VJ-9000](https://github.com/gantasmo/VJ-9000) visual engine: audio-reactive terrain, cameras, GLSL shaders, cymatics, a GPU effect chain, and recording. |
-| **LOOM** | A living colony of loops cut from your own library. Cells grow, divide and wither on the beat clock, and the graph rewires itself while it plays. |
+| **LOOM** | A living colony of loops cut from your own library. Cells divide, envelop and wither on the beat clock while it plays. |
 | **SWAY** | The SwayCommand gesture cockpit: scenes, a timeline and gesture axes bound to macros, driven by a camera or the Audima Sway. |
 | **PERFORM** | Launch scenes and clips from a grid. Opens Ableton sets and `.tasmo` projects. Pad effects and controller routing. |
 | **FOUNDRY** | Design a plugin interface on a canvas and export it as a `.gan` web-plugin. |
@@ -63,9 +64,9 @@ The other Stable Audio 3 checkpoints are one click away under **Download Models*
 | **LEARN** | A graph of your library: every remix, stem split, blend and cover, drawn in 3D or 2D. |
 | **TOUR** | Plan live dates on a map: venues, promoters, festivals, booking contacts and a route. |
 
-**Included at no cost.** Stem separation up to 12 stems, a mastering suite, VST3 hosting, the HRTF spatializer The Owl, DJ decks with sync and Automix, audio-to-MIDI with engraving, LoRA training, forced-aligned lyrics with a whisper review, and export to WAV, MP3, FLAC, OGG, AIFF, Opus, M4A, MIDI, MusicXML and LRC. Every model in that list runs on the GPU when there is one, one at a time, and never twice for the same song.
+**Included at no cost.** Stem separation up to 12 stems, a mastering suite, VST3 hosting, the HRTF spatializer The Owl, DJ decks with sync and Automix, audio-to-MIDI with engraving, LoRA training, forced-aligned lyrics with a whisper review, a rhyme and literary reading of any lyric, and export to WAV, MP3, FLAC, OGG, AIFF, Opus, M4A, MIDI, MusicXML and LRC. Every model in that list runs on the GPU when there is one, one at a time, and never twice for the same song.
 
-**Only in theDAW.** [theDAW-XR](https://github.com/gantasmo/theDAW-XR) hand-tracked control on Meta Quest 3, Chimera clip fusion, DRAW (draw on a canvas to play generative music), native Audima Sway motion-controller support, The Foundry plugin designer, import of Ableton, Reaper, FL Studio, Audacity, Audition, Bitwig and Resolume projects, the first non-Mac port of Magenta RealTime 2, and sixteen themes plus a custom theme built from any image.
+**Only in theDAW.** [theDAW-XR](https://github.com/gantasmo/theDAW-XR) hand-tracked control on Meta Quest 3, Chimera clip fusion, DRAW (draw on a canvas to play generative music), native Audima Sway motion-controller support, The Foundry plugin designer, import of Ableton, Reaper, FL Studio, Audacity, Audition, Bitwig and Resolume projects, the first non-Mac port of Magenta RealTime 2, and 28 themes plus a custom theme built from any image.
 
 ---
 
@@ -79,7 +80,7 @@ Type a prompt in the PROMPT box and press CREATE. The CONTROLS panel sets the mo
 
 **Chimera** combines several clips into one track. Drop two or more clips on the CHIMERA STACK. Chimera analyzes the tempo and key of each clip, cuts them on the beat grid, pitches them into one key, arranges the pieces into a song, and asks the model to regenerate the joins so they do not click.
 
-**Suno** generates in the cloud — pick it in the model list for simple, custom, cover and mashup modes. **Magenta RealTime 2** runs through [magenta-rt2-nvidia](https://github.com/gantasmo/magenta-rt2-nvidia), theDAW's own port for Windows with WSL2, native Linux, or a cloud GPU. Steer it with a style clip, MIDI notes on the keyboard, or both.
+**Suno** generates in the cloud. Pick it in the model list for simple, custom, cover and mashup modes. **Magenta RealTime 2** runs through [magenta-rt2-nvidia](https://github.com/gantasmo/magenta-rt2-nvidia), theDAW's own port for Windows with WSL2, native Linux, or a cloud GPU. Steer it with a style clip, MIDI notes on the keyboard, or both.
 
 ### Arrange and edit: EDIT
 
@@ -122,7 +123,15 @@ Lyrics come from the song's own lyrics field, from PASTE LYRICS, from an LRC fil
 - **TAP** times the lyrics by hand. Turn TAP on, play the song, and press Space at the start of each line. Backspace undoes the last tap. The − and + buttons move a line 50 ms.
 - **OFFSET** shifts every line at once.
 
-**AUTO** (on by default) runs ALIGN by itself when a song opens with lyrics but no timings. **PITCH** shows the melody of the vocal and draws what you sing into the microphone over it. **EXPORT** writes LRC, LRC with word tags, or plain text.
+**AUTO** (on by default) runs ALIGN by itself when a song opens with lyrics but no timings, and an import with lyrics (a Suno track, a tagged file) is aligned in the background right after its stems, so the song is ready to sing when you open it. **PITCH** shows the melody of the vocal and draws what you sing into the microphone over it. **EXPORT** writes LRC, LRC with word tags, or plain text.
+
+SING has four layouts. **LYRICS** is the karaoke alone; **BOTH** puts the whole SCORE tab beside it; **SCORE** is the score alone; **STUDY** puts the lyric's analysis beside the words.
+
+### Read what the lyric is doing: STUDY and LYRIC
+
+**STUDY** reads the words back to you: the rhyme scheme letter by letter and section by section, the near and multisyllabic rhymes drawn on the syllables that rhyme, internal and cross-line rhymes drawn as arcs, and the alliteration, assonance, anaphora, refrains, enjambment and meter marked on the words themselves. Every finding carries a confidence you can see and a floor you can raise, so a loose slant rhyme looks loose. It runs on your machine from the words. The only part that asks a model is the optional pass for metaphor, irony and puns, and it is off until you turn it on.
+
+The **LYRIC** tab is the same analysis beside a blank page: write lyrics with no song attached, with syllable counts and rhyme classes in the gutter, and save the draft into a song when it is ready.
 
 ### Mix two tracks: DJ
 
@@ -208,14 +217,15 @@ The library is on disk under `app/data`, with its metadata in `app/data/library.
 - **SEQUENCE** is a step sequencer with 16 steps per voice.
 - **DRAW** plays generative music from strokes on a canvas.
 - **SCORE**, **SING** and **DETAILS** show the selected song's notation, lyrics and metadata.
-- **MEDIA** holds dropped files and URL imports (YouTube and SoundCloud) before they go to a tab or the library.
+- **LYRIC** is a notebook for writing and analysing lyrics with no song attached.
+- **DETAILS** also holds the media bucket: dropped files and URL imports (YouTube and SoundCloud) waiting to go to a tab or the library.
 - **SLIDE** is a touch control surface. **SWAY** controls music from camera-tracked movement.
 
 ### Book the road: TOUR
 
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/tour.png" alt="The TOUR tab: 513 Austin venues plotted on the map with the venue list, addresses and booking contacts" width="900"></p>
 
-Search a city and TOUR returns the venues in it — 513 for Austin above — each with its type, address, and the website, email and phone to book it. Add the ones you want as stops and it works out the drive between them, with EV charging stops if that is what you drive.
+Search a city and TOUR returns the venues in it, 513 for Austin above, each with its type, address, and the website, email and phone to book it. Add the ones you want as stops and it works out the drive between them, with EV charging stops if that is what you drive.
 
 ### Controllers, XR and phone
 
@@ -252,7 +262,7 @@ The Small generation model runs on CPU, so machines without an NVIDIA GPU still 
 
 ## Themes and layout
 
-The hamburger menu opens Change Theme: sixteen themes (dark, metallic, paper, pastel and colour families) plus a custom theme built from any background image. A theme recolours every surface through shared design tokens. Obsidian is the default; the screenshots on this page use Brushed Steel.
+The hamburger menu opens Change Theme: 28 themes in seven groups (dark, metal, duotone, light, light duotone, pastel and gradient) plus a custom theme built from any background image. A theme recolours every surface through shared design tokens. Obsidian is the default; the screenshots on this page use Brushed Steel.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/themes/obsidian.png" alt="Obsidian theme" width="150">
@@ -277,7 +287,7 @@ theDAW is a React frontend over a FastAPI backend. The backend wraps the Stable 
 
 ```mermaid
 flowchart TD
-  UI["theDAW UI<br/>MAKE EDIT MIX PERFORM DJ VJ LOOM FOUNDRY UNDERFIT NODEFI LEARN TOUR"]:::in
+  UI["theDAW UI<br/>MAKE EDIT MIX PERFORM DJ VJ SWAY LOOM FOUNDRY UNDERFIT NODEFI LEARN TOUR"]:::in
   API["FastAPI backend :8600<br/>job queue, FFmpeg, introspection"]:::proc
   SA3["Stable Audio 3<br/>DiT + SAME AE"]:::eng
   MODS["Plugin modules<br/>stems, notation, lyrics, midi, vocal ..."]:::proc
