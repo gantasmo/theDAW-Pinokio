@@ -1,0 +1,110 @@
+# Runs the launcher's own commands on hosted machines.
+#
+# Pinokio is not on a runner, so each job reads the shell lines and the
+# environment out of the launcher's scripts (.github/scripts/launcher.js) and
+# runs exactly those. What this proves is that the commands work; what it
+# cannot prove is anything about Pinokio's own shell.
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scripts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Every script parses and the menu shows the right entries
+        run: node .github/scripts/launcher.js validate
+
+  # gantasmo/theDAW-Pinokio#5. sharp, a VJ-9000 dependency, builds from source
+  # when pkg-config finds a system libvips new enough for it, and that build
+  # stops at a missing node-addon-api. Arch carries a current libvips, which
+  # is what the report was made on.
+  vj-install-linux:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    timeout-minutes: 20
+    steps:
+      - name: A system libvips, Node and a compiler
+        run: pacman -Syu --noconfirm --needed git nodejs npm libvips pkgconf base-devel python
+      - uses: actions/checkout@v7
+      - name: The system libvips sharp will find
+        run: pkg-config --modversion vips-cpp
+      - name: Clone VJ-9000 the way Install does
+        run: |
+          git clone --depth 1 https://github.com/gantasmo/VJ-9000 vj
+          cp -r vj vj-plain
+      - name: npm install with no environment (the reported failure, for the record)
+        run: |
+          cd vj-plain
+          if npm install > ../plain.log 2>&1; then
+            echo "The plain install succeeded: this image does not reproduce the failure." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            grep -nE "node-addon-api|build from source" ../plain.log | head -5 || tail -20 ../plain.log
+            echo "The plain install failed, as reported in #5." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: The environment install.json and update.js give the VJ install
+        run: node .github/scripts/launcher.js vj-env | tee -a "$GITHUB_ENV"
+      - name: npm install with that environment
+        run: cd vj && npm install
+      - name: sharp loads with its own libvips
+        run: |
+          cd vj
+          at="$(npm ls sharp --all --parseable | head -1)"
+          test -n "$at" || { echo "VJ-9000 no longer installs sharp"; exit 1; }
+          node -e "const s = require(process.argv[1]); console.log('sharp', s.versions.sharp, 'with libvips', s.versions.vips)" "$at" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # The live VST3 host. The runner has Visual Studio 2022 with the C++
+  # workload, which is what Pinokio's AI bundle installs as Build Tools, and
+  # Miniconda, which stands in for Pinokio's conda.
+  vst-host-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: theDAW's host sources where the launcher expects them
+        shell: bash
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/gantasmo/theDAW app
+          git -C app sparse-checkout set native/vst-host
+          test -f app/native/vst-host/build.ps1
+      - name: The lines of build-vst-host.json, typed into cmd with conda active
+        shell: pwsh
+        run: |
+          $lines = @('call "%CONDA%\Scripts\activate.bat"', 'cd /d app')
+          $lines += node .github/scripts/launcher.js lines build-vst-host.json
+          $lines += 'exit'
+          $lines | Set-Content -Encoding ascii lines.txt
+          Get-Content lines.txt
+          Get-Content lines.txt | cmd /d /q
+      - name: The host exists and answers
+        shell: pwsh
+        run: |
+          $exe = 'app\native\vst-host\bin\thedaw-vst-host.exe'
+          if (-not (Test-Path $exe)) { throw 'build-vst-host.json did not produce the host' }
+          & $exe --version | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+          if ($LASTEXITCODE -ne 0) { throw "the host exited $LASTEXITCODE" }
+      - name: The lines of install.json build it again from a clean tree
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force app\native\vst-host\bin, app\native\vst-host\build
+          $lines = @('call "%CONDA%\Scripts\activate.bat"', 'cd /d app')
+          $lines += node .github/scripts/launcher.js lines install.json
+          $lines += 'exit'
+          $lines | Set-Content -Encoding ascii lines.txt
+          Get-Content lines.txt | cmd /d /q
+          $exe = 'app\native\vst-host\bin\thedaw-vst-host.exe'
+          if (-not (Test-Path $exe)) { throw 'install.json did not produce the host' }
+          & $exe --version
