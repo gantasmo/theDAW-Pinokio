@@ -113,6 +113,7 @@
       "method": "shell.run",
       "params": {
         "path": "app/vj",
+        "env": { "SHARP_IGNORE_GLOBAL_LIBVIPS": "1" },
         "message": ["npm install"]
       }
     },

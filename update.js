@@ -114,9 +114,15 @@ module.exports = {
       ]
     }
   }, {
+    // sharp (a VJ-9000 dependency) skips its prebuilt binary and builds from
+    // source whenever pkg-config finds a system libvips, which a Linux
+    // desktop often has, and that build aborts on a missing node-addon-api
+    // and takes the whole Update with it. SHARP_IGNORE_GLOBAL_LIBVIPS makes
+    // sharp use the prebuilt binary on every machine.
     method: "shell.run",
     params: {
       path: "app/vj",
+      env: { "SHARP_IGNORE_GLOBAL_LIBVIPS": "1" },
       message: [
         "npm install"
       ]
