@@ -140,6 +140,10 @@ jobs:
           if (-not (Test-Path $exe)) { throw 'build-vst-host.json did not produce the host' }
           & $exe --version | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
           if ($LASTEXITCODE -ne 0) { throw "the host exited $LASTEXITCODE" }
+          # The host's own check of its engine and its WebSocket server.
+          & $exe --selftest
+          if ($LASTEXITCODE -ne 0) { throw "the host's self test exited $LASTEXITCODE" }
+          "self test passed" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
       - name: The lines of install.json build it again from a clean tree
         shell: pwsh
         run: |
