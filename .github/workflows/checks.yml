@@ -1,0 +1,190 @@
+# Runs the launcher's own commands on hosted machines.
+#
+# Pinokio is not on a runner, so each job reads the shell lines and the
+# environment out of the launcher's scripts (.github/scripts/launcher.js) and
+# runs exactly those. What this proves is that the commands work; what it
+# cannot prove is anything about Pinokio's own shell.
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # The theDAW ref whose host sources the Windows jobs build. Install clones
+  # main, so main is what has to build.
+  THEDAW_REF: main
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scripts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Every script parses and the menu shows the right entries
+        run: node .github/scripts/launcher.js validate
+
+  # Pinokio decides whether a step failed from its terminal output. This loads
+  # that code from pinokiod as it ships and asks it about the host build steps.
+  pinokio-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pinokio's engine
+        run: |
+          git clone --depth 1 https://github.com/pinokiocomputer/pinokiod pinokiod
+          echo "pinokiod at $(git -C pinokiod log -1 --format=%h)" | tee -a "$GITHUB_STEP_SUMMARY"
+          cd pinokiod && npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Each host build step, through kernel/shells.js
+        run: node .github/scripts/pinokio-rules.js pinokiod | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # gantasmo/theDAW-Pinokio#5. sharp, a VJ-9000 dependency, builds from source
+  # when pkg-config finds a system libvips new enough for it, and that build
+  # stops at a missing node-addon-api. Arch carries a current libvips, which
+  # is what the report was made on.
+  vj-install-linux:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # 11.16.0 is the npm of the report, the one Pinokio's Node carried.
+        # "image" is the npm Arch ships: npm 12 blocks install scripts until
+        # they are approved, so sharp's check does not run during the install.
+        npm: ['11.16.0', image]
+    steps:
+      - name: A system libvips, Node and a compiler
+        run: pacman -Syu --noconfirm --needed git nodejs npm libvips pkgconf base-devel python
+      - name: npm ${{ matrix.npm }}
+        if: matrix.npm != 'image'
+        run: npm install -g npm@${{ matrix.npm }}
+      - uses: actions/checkout@v7
+      - name: Versions
+        run: |
+          echo "node $(node --version), npm $(npm --version), system libvips $(pkg-config --modversion vips-cpp)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Clone VJ-9000 the way Install does
+        run: |
+          git clone --depth 1 https://github.com/gantasmo/VJ-9000 vj
+          cp -r vj vj-plain
+      - name: npm install with no environment (the reported failure, for the record)
+        run: |
+          cd vj-plain
+          if npm install > ../plain.log 2>&1; then
+            grep -n "install-scripts\|allow-scripts" ../plain.log | head -8 || true
+            echo "Plain install: succeeded." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            grep -nE "node-addon-api|build from source" ../plain.log | head -5 || tail -20 ../plain.log
+            echo "Plain install: failed, as reported in #5." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: The steps install.json runs in app/vj, in order, with their environment
+        run: |
+          node .github/scripts/launcher.js vj-script install.json | tee vj-steps.sh
+          cd vj
+          bash ../vj-steps.sh
+      - name: sharp loads with its own libvips
+        run: |
+          cd vj
+          at="$(npm ls sharp --all --parseable | head -1)"
+          test -n "$at" || { echo "VJ-9000 no longer installs sharp"; exit 1; }
+          node -e "const s = require(process.argv[1]); console.log('sharp', s.versions.sharp, 'loads with libvips', s.versions.vips)" "$at" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # The live VST3 host, on two machines. windows-2022 has Visual Studio 2022,
+  # the generation Pinokio's AI bundle installs as Build Tools. windows-latest
+  # has Visual Studio 2026 and nothing older, which theDAW's build.ps1 could
+  # not name until gantasmo/theDAW's fix-vst-host-vs2026-generator. Miniconda
+  # on the runner stands in for Pinokio's conda.
+  vst-host-windows:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: theDAW's host sources where the launcher expects them
+        shell: bash
+        run: |
+          git clone --depth 1 --branch "$THEDAW_REF" --filter=blob:none --sparse https://github.com/gantasmo/theDAW app
+          git -C app sparse-checkout set native/vst-host
+          test -f app/native/vst-host/build.ps1
+      - name: The Visual Studio installs on this machine
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property catalog_productDisplayVersion -format value | ForEach-Object { "Visual Studio with the C++ tools: $_" } | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+          "theDAW ref: $env:THEDAW_REF" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+      - name: The lines of build-vst-host.json, typed into cmd with conda active
+        shell: pwsh
+        run: |
+          $lines = @('call "%CONDA%\Scripts\activate.bat"', 'cd /d app')
+          $lines += node .github/scripts/launcher.js lines build-vst-host.json
+          $lines += 'exit'
+          $lines | Set-Content -Encoding ascii lines.txt
+          Get-Content lines.txt
+          Get-Content lines.txt | cmd /d /q
+      - name: The host exists and answers
+        shell: pwsh
+        run: |
+          $exe = 'app\native\vst-host\bin\thedaw-vst-host.exe'
+          if (-not (Test-Path $exe)) { throw 'build-vst-host.json did not produce the host' }
+          & $exe --version | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+          if ($LASTEXITCODE -ne 0) { throw "the host exited $LASTEXITCODE" }
+          # The host's own check of its engine and its WebSocket server.
+          & $exe --selftest
+          if ($LASTEXITCODE -ne 0) { throw "the host's self test exited $LASTEXITCODE" }
+          "self test passed" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+      - name: The lines of install.json build it again from a clean tree
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force app\native\vst-host\bin, app\native\vst-host\build
+          $lines = @('call "%CONDA%\Scripts\activate.bat"', 'cd /d app')
+          $lines += node .github/scripts/launcher.js lines install.json
+          $lines += 'exit'
+          $lines | Set-Content -Encoding ascii lines.txt
+          Get-Content lines.txt | cmd /d /q
+          $exe = 'app\native\vst-host\bin\thedaw-vst-host.exe'
+          if (-not (Test-Path $exe)) { throw 'install.json did not produce the host' }
+          & $exe --version
+
+      # The same two scripts again, typed by Pinokio's own shell manager and
+      # terminal class on a real cmd.exe. Pinokio fails a step from what the
+      # terminal shows, the echoed command included, so a build that works has
+      # to come back with no error.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - name: Pinokio's engine and its terminal module
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/pinokiocomputer/pinokiod pinokiod
+          echo "pinokiod at $(git -C pinokiod log -1 --format=%h)" | tee -a "$GITHUB_STEP_SUMMARY"
+          cd pinokiod
+          npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+          cd node_modules/@homebridge/node-pty-prebuilt-multiarch
+          node ../../prebuild-install/bin.js
+      - name: conda on PATH, in place of Pinokio's activation
+        shell: bash
+        run: |
+          echo "$CONDA/condabin" >> "$GITHUB_PATH"
+          echo "$CONDA/Library/bin" >> "$GITHUB_PATH"
+      - name: build-vst-host.json through Pinokio's terminal, from a clean tree
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force app\native\vst-host\bin, app\native\vst-host\build
+          node .github/scripts/pinokio-terminal.js pinokiod build-vst-host.json .
+      - name: install.json through Pinokio's terminal, from a clean tree
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force app\native\vst-host\bin, app\native\vst-host\build
+          node .github/scripts/pinokio-terminal.js pinokiod install.json .
