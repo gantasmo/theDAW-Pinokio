@@ -6,8 +6,8 @@
       "params": {
         "path": "app",
         "message": [
-          "where cmake >nul 2>&1 || conda install -y -c conda-forge cmake",
-          "set \"CMAKE_GENERATOR=\" & powershell -NoProfile -ExecutionPolicy Bypass -File native\\vst-host\\build.ps1 -NoWerror"
+          "conda install -y -c conda-forge cmake",
+          "set \"CMAKE_GENERATOR=\" & powershell -NoProfile -ExecutionPolicy Bypass -File native\\vst-host\\build.ps1 -NoWerror || echo error: the live VST3 host did not build. The compiler output is above."
         ]
       }
     }

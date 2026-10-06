@@ -293,7 +293,7 @@ The Python dependency set self-selects per platform through `uv`:
 
 The Small generation model runs on CPU, so machines without an NVIDIA GPU still generate audio. The Medium model, Magenta, Demucs and GPU whisper want an NVIDIA driver of 580 or newer: the torch build is a CUDA 13 wheel, which needs the R580 driver branch.
 
-Live VST3 (instruments, plugin windows and hosted effects in EDIT, PERFORM and the piano roll) runs in theDAW's native plugin host. The host is Windows-only and built from source. Install and Update build it with the Visual Studio Build Tools that Pinokio's AI bundle installs, and with CMake, which the launcher installs through conda when none is on the PATH. **Build VST3 Host** in the launcher menu runs the build by itself. Without the host, VST3 effects still process offline.
+Live VST3 (instruments, plugin windows and hosted effects in EDIT, PERFORM and the piano roll) runs in theDAW's native plugin host. The host is Windows-only and built from source. Install and Update build it with the Visual Studio Build Tools that Pinokio's AI bundle installs, and with CMake, which the launcher installs through conda. **Build VST3 Host** in the launcher menu runs the build by itself. Without the host, VST3 effects still process offline.
 
 ## Themes and layout
 
