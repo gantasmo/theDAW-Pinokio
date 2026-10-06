@@ -16,8 +16,9 @@ permissions:
   contents: read
 
 env:
-  # The theDAW ref whose host sources the Windows job builds.
-  THEDAW_REF: fix-vst-host-vs2026-generator
+  # The theDAW ref whose host sources the Windows jobs build. Install clones
+  # main, so main is what has to build.
+  THEDAW_REF: main
 
 concurrency:
   group: checks-${{ github.ref }}
@@ -83,12 +84,18 @@ jobs:
           test -n "$at" || { echo "VJ-9000 no longer installs sharp"; exit 1; }
           node -e "const s = require(process.argv[1]); console.log('sharp', s.versions.sharp, 'loads with libvips', s.versions.vips)" "$at" | tee -a "$GITHUB_STEP_SUMMARY"
 
-  # The live VST3 host. The runner has one Visual Studio with the C++ workload
-  # (2026 on the windows-2025-vs2026 image; Pinokio's AI bundle installs the
-  # 2022 Build Tools) and Miniconda, which stands in for Pinokio's conda.
+  # The live VST3 host, on two machines. windows-2022 has Visual Studio 2022,
+  # the generation Pinokio's AI bundle installs as Build Tools. windows-latest
+  # has Visual Studio 2026 and nothing older, which theDAW's build.ps1 could
+  # not name until gantasmo/theDAW's fix-vst-host-vs2026-generator. Miniconda
+  # on the runner stands in for Pinokio's conda.
   vst-host-windows:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-latest]
     steps:
       - uses: actions/checkout@v7
       - name: theDAW's host sources where the launcher expects them
