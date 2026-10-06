@@ -28,7 +28,7 @@ const one = (name, test, what) => {
 }
 const vjInstall = (name) =>
   one(name, (s) => s.params && s.params.path === "app/vj" && lines(s).join(" ") === "npm install", "VJ npm install step")
-const hostBuild = (name) => one(name, (s) => lines(s).join(" ").includes("build-vst-host.ps1"), "host build step")
+const hostBuild = (name) => one(name, (s) => lines(s).join(" ").includes("build.ps1"), "host build step")
 
 // The steps a script runs inside app/vj, in order, each with its environment.
 const vjSteps = (name) =>

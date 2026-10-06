@@ -29,7 +29,7 @@ const steps = (name) => {
   return (name.endsWith(".json") ? JSON.parse(fs.readFileSync(file, "utf8")) : require(file)).run
 }
 const hostBuild = (name) => {
-  const found = steps(name).filter((s) => [].concat((s.params && s.params.message) || []).join(" ").includes("build-vst-host.ps1"))
+  const found = steps(name).filter((s) => [].concat((s.params && s.params.message) || []).join(" ").includes("build.ps1"))
   if (found.length !== 1) throw new Error(`${name}: expected one host build step, found ${found.length}`)
   return found[0]
 }

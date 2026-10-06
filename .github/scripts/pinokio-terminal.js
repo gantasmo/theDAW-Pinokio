@@ -66,7 +66,7 @@ const fail = (message) => {
 
   const file = path.join(launcher, scriptName)
   const steps = (scriptName.endsWith(".json") ? JSON.parse(fs.readFileSync(file, "utf8")) : require(file)).run
-  const found = steps.filter((s) => [].concat((s.params && s.params.message) || []).join(" ").includes("build-vst-host.ps1"))
+  const found = steps.filter((s) => [].concat((s.params && s.params.message) || []).join(" ").includes("build.ps1"))
   if (found.length !== 1) fail(`${scriptName}: expected one host build step, found ${found.length}`)
   const step = found[0]
   const cwd = path.join(launcher, step.params.path || "")
