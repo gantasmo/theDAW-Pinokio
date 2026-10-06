@@ -152,3 +152,35 @@ jobs:
           $exe = 'app\native\vst-host\bin\thedaw-vst-host.exe'
           if (-not (Test-Path $exe)) { throw 'install.json did not produce the host' }
           & $exe --version
+
+      # The same two scripts again, typed by Pinokio's own shell manager and
+      # terminal class on a real cmd.exe. Pinokio fails a step from what the
+      # terminal shows, the echoed command included, so a build that works has
+      # to come back with no error.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+      - name: Pinokio's engine and its terminal module
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/pinokiocomputer/pinokiod pinokiod
+          echo "pinokiod at $(git -C pinokiod log -1 --format=%h)" | tee -a "$GITHUB_STEP_SUMMARY"
+          cd pinokiod
+          npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+          cd node_modules/@homebridge/node-pty-prebuilt-multiarch
+          node ../../prebuild-install/bin.js
+      - name: conda on PATH, in place of Pinokio's activation
+        shell: bash
+        run: |
+          echo "$CONDA/condabin" >> "$GITHUB_PATH"
+          echo "$CONDA/Library/bin" >> "$GITHUB_PATH"
+      - name: build-vst-host.json through Pinokio's terminal, from a clean tree
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force app\native\vst-host\bin, app\native\vst-host\build
+          node .github/scripts/pinokio-terminal.js pinokiod build-vst-host.json .
+      - name: install.json through Pinokio's terminal, from a clean tree
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force app\native\vst-host\bin, app\native\vst-host\build
+          node .github/scripts/pinokio-terminal.js pinokiod install.json .
