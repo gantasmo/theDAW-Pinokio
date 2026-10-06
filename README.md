@@ -48,7 +48,7 @@ The other Stable Audio 3 checkpoints are one click away under **Download Models*
 | Tab | What it is for |
 |---|---|
 | **MAKE** | Generate audio from a text prompt, from your own audio, or by filling in a painted region. Chimera combines several clips into one track. Suno (cloud) and Magenta RealTime 2 are in the same model list. |
-| **EDIT** | A multitrack timeline. Cut, move and fade clips, record automation, add insert effects per track, and render the arrangement to a WAV file. |
+| **EDIT** | A multitrack timeline. Cut, move and fade clips, record automation, add insert effects per track, and render the arrangement to a WAV file. MIDI tracks play sound banks or VST3 instruments, and a Symphony template seats an orchestra in a measured concert hall. |
 | **MIX** | Mastering and effects. A chain of 25 effects, each with its own control panel, Quick Master knobs, VST3 plugins, `.gan` web-plugins and LUFS metering. |
 | **SCORE** | Audio to MIDI to notation. Sheet music, tablature, arrangements, drum notation, and four play-along views that follow the track. Exports a Beat Saber level. |
 | **SING** | Lyrics that follow the song word by word. Paste lyrics and a forced aligner times every word against the vocal, or tap the timing yourself. Imports and exports LRC. Scores your pitch. Puts the score, or a reading of the lyric's rhyme scheme and literary devices, beside the words. |
@@ -57,11 +57,11 @@ The other Stable Audio 3 checkpoints are one click away under **Download Models*
 | **VJ** | The [VJ-9000](https://github.com/gantasmo/VJ-9000) visual engine: audio-reactive terrain, cameras, GLSL shaders, cymatics, a GPU effect chain, and recording. |
 | **LOOM** | A living colony of loops cut from your own library. Cells divide, envelop and wither on the beat clock while it plays. |
 | **SWAY** | The SwayCommand gesture cockpit: scenes, a timeline and gesture axes bound to macros, driven by a camera or the Audima Labs Sway. |
-| **PERFORM** | Launch scenes and clips from a grid. Opens Ableton sets and `.tasmo` projects. Pad effects and controller routing. |
+| **PERFORM** | Launch scenes and clips from a grid. Opens Ableton sets and `.tasmo` projects. Pad effects and controller routing. Every track slot takes any rack effect or VST3 plugin. |
 | **FOUNDRY** | Design a plugin interface on a canvas and export it as a `.gan` web-plugin. |
 | **NODEFI** | Connect generation, effects and library nodes into a graph. Run it as a pipeline or play it live. |
 | **UNDERFIT** | Train LoRA adapters on your own audio and use them when generating. |
-| **LEARN** | A graph of your library: every remix, stem split, blend and cover, drawn in 3D or 2D. |
+| **LEARN** | A graph of your library: every remix, stem split, blend and cover, drawn in 3D or 2D. On a large library, counted lists you can search and page. |
 | **TOUR** | Plan live dates on a map: venues, promoters, festivals, booking contacts and a route. |
 
 **Included at no cost.** Stem separation up to 12 stems, a mastering suite, VST3 hosting, the HRTF spatializer The Owl, DJ decks with sync and Automix, audio-to-MIDI with engraving, LoRA training, forced-aligned lyrics with a whisper review, a rhyme and literary reading of any lyric, and export to WAV, MP3, FLAC, OGG, AIFF, Opus, M4A, MIDI, MusicXML and LRC. Every model in that list runs on the GPU when there is one, one at a time, and never twice for the same song.
@@ -88,6 +88,10 @@ Type a prompt in the PROMPT box and press CREATE. The CONTROLS panel sets the mo
 
 Drag clips along a track or onto another track with the Move tool. Split a clip with the Cut tool. Drag a clip's corner handles to set fade in and fade out. Each track has mute, solo, volume, pan and its own insert effects. Turn on WRITE and move a control during playback to record automation. COMMIT EDIT renders every audible track into one 44.1 kHz stereo WAV.
 
+A MIDI track plays live on an instrument of its own: the bundled General MIDI bank, a sound bank you add (SF2, SF3 or DLS), or a scanned VST3 instrument picked in the track header, and every bounce, freeze and export prints it. **Settings → Sound banks** downloads the theDAW Orchestra bank: strings, woodwinds, brass, harp and orchestral percussion built from CC0 samples, with spiccato, staccato, pizzicato, tremolo and mutes as articulations. The **Symphony orchestra** template adds sixteen seated section tracks on five section buses that share a hall send, and the hall is the Detmold Konzerthaus, measured by seat and stage position. A track can also send its MIDI to a hardware port with clock, song position and Start/Stop.
+
+The arrangement holds a tempo map and a meter map, and **Use song tempo** sets both from a song's rhythm analysis. Every track row draws its volume as a line: drag it for the fader, right-click it for a keyframe. A bus takes VST3 inserts, an automation lane rides any plugin parameter on a track, a bus or the master, and a plugin's window opens at the plugin's own size. Recording keeps takes for comping and punches on the loop region, with a metronome and a count-in. A song's sections land as markers, and Ctrl+drag copies a clip.
+
 ### Master and add effects: MIX
 
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/mix.png" alt="The MIX tab with a five-effect chain, the Maximizer control panel and the Quick Master knobs" width="820"></p>
@@ -105,6 +109,8 @@ Add effects from the EFFECTS list to the CHAIN. Audio flows through the chain fr
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/score.png" alt="The SCORE tab showing a piano-reduction arrangement of a track's MIDI" width="820"></p>
 
 Right-click a track in the library and choose **Convert to MIDI** (a drum stem gets a drum-kit transcription). Then open the SCORE tab in the bottom panel with that track selected. **MAKE SHEET** engraves the MIDI as MusicXML sheet music, **MAKE TABS** writes guitar, bass or ukulele tablature for a chosen tuning, capo and difficulty, **ARRANGE** builds a lead sheet, a piano reduction, a simplified part or a band score with drums on a percussion staff, and **MAKE CHORDS** derives a chord track from the lead sheet or estimates one from the audio. Scores export to PDF, SVG, ABC and MusicXML.
+
+A score does not need a recording. **IMPORT SCORE FILE** opens a MusicXML, `.mxl`, kern or ABC file as a composition, and **BROWSE CORPUS** opens a piece from the music21 corpus. The **EXPORT** menu adds **PERFORM (MIDI)**, which plays the sheet's dynamics, hairpins and articulations as an expressive MIDI with a tempo map, **MIDI (SOUNDING)** for the whole sheet or one part, and an audio render through MuseScore 4 and Muse Sounds when they are installed.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/score-strip.png" alt="The STRIP play-along view: one long staff scrolling under the now-line, with played notes kept in magenta ink" width="410">
@@ -127,6 +133,8 @@ Lyrics come from the song's own lyrics field, from PASTE LYRICS, from an LRC fil
 
 SING has four layouts. **LYRICS** is the karaoke alone; **BOTH** puts the whole SCORE tab beside it; **SCORE** is the score alone; **STUDY** puts the lyric's analysis beside the words.
 
+Latin is in the language picker. A Latin lyric aligns with its macrons and ligatures kept on the page, and STUDY reads it by the Latin rules: syllables, stress and classical scansion.
+
 ### Read what the lyric is doing: STUDY and LYRIC
 
 **STUDY** reads the words back to you: the rhyme scheme letter by letter and section by section, the near and multisyllabic rhymes drawn on the syllables that rhyme, internal and cross-line rhymes drawn as arcs, and the alliteration, assonance, anaphora, refrains, enjambment and meter marked on the words themselves. Every finding carries a confidence you can see and a floor you can raise, so a loose slant rhyme looks loose. It runs on your machine from the words. The only part that asks a model is the optional pass for metaphor, irony and puns, and it is off until you turn it on.
@@ -137,7 +145,7 @@ The **LYRIC** tab is the same analysis beside a blank page: write lyrics with no
 
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/dj.png" alt="The DJ tab with a track on each deck, the mixer and the FX rack" width="820"></p>
 
-Load a track on each deck from the browser at the bottom. Press SYNC to match the tempo of the incoming deck to the playing deck. Each deck has pitch, key lock, a 3-band EQ, a filter, hotcues, beat loops, loop rolls, slip and quantize. The FX rack has flanger, reverb and wah per deck and a master limiter. STEMS separates a deck into stems with a fader for each one. CUE sends a deck to a headphone output. AUTOMIX plays a set on its own with beat-matched crossfades.
+Load a track on each deck from the browser at the bottom. Press SYNC to match the tempo of the incoming deck to the playing deck. Each deck has pitch, key lock, a 3-band EQ, a filter, hotcues, beat loops, loop rolls, slip and quantize. The FX rack has flanger, reverb and wah per deck and a master limiter. STEMS separates a deck into stems with a fader for each one. CUE sends a deck to a headphone output. AUTOMIX plays a set on its own, and **START AUTO DJ** in the header starts one in a single press. Each blend begins on a 16-beat phrase line, hands the bass from the outgoing track to the incoming one, corrects phase by bending the platter, and skips a key clash for the nearest compatible track. Hot cues are seeded from the analysis: the first downbeat, then the 16, 32 and 48-bar phrase starts.
 
 **Prepared performance sets.** Drop a set folder with its audio files and a `performance.json` timeline into `app/data/performance-sets/`. It appears under Sets, and automix follows each track's cue-in, mix-out and transition length exactly as prepared. During the show the assistant orb can read what is on, start or stop the set, blend into the next track now, or move a track to play next.
 
@@ -151,7 +159,7 @@ Pick a source in the SOURCES panel: a webcam, a phone, tablet or Quest camera ov
 
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/perform.png" alt="The PERFORM grid: six stem tracks and eight scenes from a .tasmo live set" width="820"></p>
 
-Open an Ableton set or a `.tasmo` project in the OPEN field. Each column is a track and each row is a scene. Click a clip to launch it, or click a scene to launch every clip in that row. Clips loop, warp to the tempo, and run through the track mixer and effects. Sway Perform adds pad effect punches, a template per song, and the SwayCommand deck for assigning a controller.
+Open an Ableton set or a `.tasmo` project in the OPEN field. Each column is a track and each row is a scene. Click a clip to launch it, or click a scene to launch every clip in that row. Clips loop, warp to the tempo, and run through the track mixer and effects. Sway Perform adds pad effect punches, a template per song, and the SwayCommand deck for assigning a controller. Every track slot takes every rack effect and every scanned VST3 plugin; a hosted plugin opens its own window, and a knob, an XY axis or a gesture can drive its parameters.
 
 ### Design a plugin interface: FOUNDRY
 
@@ -169,7 +177,7 @@ Every song in the library is torn into bar- and beat-aligned fragments of each s
 
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/sway.png" alt="The SwayCommand cockpit: the scene list, the timeline, and gesture axes bound to macro knobs and named pads" width="900"></p>
 
-SWAY embeds the [SwayCommand](https://github.com/danieljtrujillo/SwayCommand) cockpit whole: scenes down the left, a timeline underneath, and gesture axes (X, Y, PULSE, PRESS, SWAY) bound to macro knobs and named pads. Move in front of a camera, or move the Audima Labs Sway motion controller, and you are playing those controls. theDAW owns the only `requestMIDIAccess()` in the app and relays hardware into the cockpit, so a controller you plug in reaches it with no extra setup.
+SWAY embeds the [SwayCommand](https://github.com/danieljtrujillo/SwayCommand) cockpit whole: scenes down the left, a timeline underneath, and gesture axes (X, Y, PULSE, PRESS, SWAY) bound to macro knobs and named pads. Move in front of a camera, or move the Audima Labs Sway motion controller, and you are playing those controls. theDAW owns the only `requestMIDIAccess()` in the app and relays hardware into the cockpit, so a controller you plug in reaches it with no extra setup. A cockpit track's VST3 chain renders through theDAW, and LOAD .gan asks theDAW for the plugin file.
 
 ### Connect nodes: NODEFI
 
@@ -192,6 +200,8 @@ Press NEW DATASET to add audio, then NEW FINETUNE to set the adapter type (eight
 
 LEARN draws every track and the links between them as a 3D graph, a 2D graph, or a layered diagram. A remix, an inpaint, a stem split, a Chimera blend and a Suno cover each link to the track they came from.
 
+On a large library LEARN opens on counted headlines instead of one drawing. Every number opens a list you can search, sort and page, built to hold 200,000 songs, and **Classic graph** draws the family of the song in focus.
+
 ### Find and organize tracks: Library and Catalogue
 
 <p align="center">
@@ -199,7 +209,9 @@ LEARN draws every track and the links between them as a 3D graph, a 2D graph, or
   <img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/catalogue.png" alt="The Catalogue gallery with provider badges and the inspector" width="410">
 </p>
 
-The library is on disk under `app/data`, with its metadata in `app/data/library.db`. Every generated track is saved with its prompt, model and settings. Imported tracks keep their lyrics and tags. Sub-tabs list a track's STEMS, MIDI, VIDEO and SCORE files. SUGGEST orders tracks into a playlist by Camelot key and BPM. The Catalogue is the full-width view of the same library with an inspector, spectrograms on demand and a lineage panel.
+The library is on disk under `app/data`, with its metadata in `app/data/library.db`. Every generated track is saved with its prompt, model and settings. Imported tracks keep their lyrics and tags. Sub-tabs list a track's STEMS, MIDI, VIDEO and SCORE files. A MIDI row's menu brings every stem MIDI of its song in at once: **All stems to piano roll** gives each stem a part of its own, and **All stems to EDIT as tracks** gives each stem an EDIT track, each on its stem's instrument. SUGGEST orders tracks into a playlist by Camelot key and BPM. The Catalogue is the full-width view of the same library with an inspector, spectrograms on demand and a lineage panel.
+
+Each entry carries a provider badge: Stable Audio, theDAW, Suno, Udio, Riffusion, Magenta or Imported. **Media roots** in Settings → Storage name folders of your own, and an entry whose audio lives there plays in place with nothing copied. DETAILS shows a song's sections as a strip, found on its bar grid and labelled A B A', and the same sections become EDIT markers and roll markers.
 
 theDAW remembers every path it writes. A file it installs, saves, downloads or exports is registered, so pickers open in the folder you last used for that kind of file, a Recent list hands the file straight back, and Show in Folder opens it in the file manager. Saving goes through the native Save As dialog.
 
@@ -209,7 +221,11 @@ Right-click a track and choose **Convert to MIDI**, or draw notes in by hand. Th
 
 The roll carries a meter map, so the time signature can change across one piece, with additive groupings like 7/8 as 2+2+3 and a pickup bar before the first full bar. Polymeter lanes each run their own meter and loop length against the same clock. A pitch bend lane sits under the keys with a semitone range and LINE, HOLD and CURVE point shapes.
 
-The SHAPE row under the roll transforms what is there: harmony, ragtime, runs, polyrhythm and humanize, each with syncopation and accent amounts. **MATCH** pulls a song's meter map, tempo and lanes from its rhythm analysis. **GEN** writes LOOM generator rules into the active lane. **ARP** writes a chord-progression arpeggio. CAPTURE, SONG and FORM assemble a multi-section arrangement from intro to outro. A microphone turns a sung line into notes, and an AI compose flyout writes a piano part from a key and mode.
+The SHAPE row under the roll transforms what is there: harmony, ragtime, runs, polyrhythm and humanize, each with syncopation and accent amounts. **MATCH** pulls a song's meter map, tempo and lanes from its rhythm analysis, and a part transcribed from the song keeps its notes at their seconds under the new tempo. With **KEEP TIME** on, beside BPM, a tempo you type keeps every note at its second too. **CLEAN** reduces a transcription to one line or to a pitch range. **GEN** writes LOOM generator rules into the active lane. **ARP** writes a chord-progression arpeggio. CAPTURE, SONG and FORM assemble a multi-section arrangement from intro to outro. A microphone turns a sung line into notes, and an AI compose flyout writes a piano part from a key and mode.
+
+One roll document holds a whole orchestra as parts, each on a sound of its own: a sound bank preset or a VST3 instrument. The roll plays a tempo map with ramps and fermatas, snaps to triplets, quintuplets and septuplets, and carries named section and movement markers. Lanes under the keys draw each part's controllers (modulation, volume, pan, expression, pedal, brightness and reverb send), its articulations, and a note's own pressure, timbre and bend. MPE files import and export with that expression.
+
+**COMPOSE** on the rail writes music by rule and checks it: a seeded harmony planner in roman numerals voiced in four parts, a voice-leading check, figured bass realization, form plans (sonata, rondo, variations, minuet, scherzo and a four-movement symphony), species counterpoint one to five on a cantus firmus, two-voice canons, fugue expositions with tonal answers, and ten composer style profiles. **TRANSFORM** inverts, reverses, augments, diminishes, sequences and fragments the selected notes.
 
 It reads MusicXML, ABC, Humdrum and MIDI, taking time signatures and tempo maps from MIDI files, and writes MIDI back out with the roll's own tempo and meters.
 
@@ -225,7 +241,7 @@ It reads MusicXML, ABC, Humdrum and MIDI, taking time signatures and tempo maps 
 
 - **LEVELS** meters loudness, true peak, dynamics and stereo image against a delivery target.
 - **VISUALIZE** shows an oscilloscope, a spectrum or a radial view.
-- **MIDI** is the piano roll described above: meter maps, polymeter lanes, a pitch bend lane and the SHAPE transforms.
+- **MIDI** is the piano roll described above: parts, meter and tempo maps, polymeter lanes, controller and bend lanes, COMPOSE and the SHAPE transforms.
 - **SEQUENCE** is a step sequencer with 16 steps per voice.
 - **DRAW** plays generative music from strokes on a canvas.
 - **SCORE**, **SING** and **DETAILS** show the selected song's notation, lyrics and metadata.
@@ -241,15 +257,15 @@ Search a city and TOUR returns the venues in it, 513 for Austin above, each with
 
 ### Controllers, XR and phone
 
-Controller recognition knows about 110 device profiles, detects a connected controller, learns one by capture, and **Controller Vision** identifies a controller from a photo. The Audima Labs Sway motion controller works natively. [theDAW-XR](https://github.com/gantasmo/theDAW-XR) turns a Meta Quest 3 into a hands-only controller with hand-tracked MIDI, passthrough video into VJ and co-located multiplayer. A phone web app pairs with the desktop for remote MAKE, transport, DJ and library control.
+Controller recognition knows about 110 device profiles, detects a connected controller, learns one by capture, and **Controller Vision** identifies a controller from a photo. The Audima Labs Sway motion controller works natively. [theDAW-XR](https://github.com/gantasmo/theDAW-XR) turns a Meta Quest 3 into a hands-only controller with hand-tracked MIDI, passthrough video into VJ and co-located multiplayer. A phone web app pairs with the desktop for remote MAKE, transport, DJ and library control, and a switch in Settings serves theDAW over HTTPS on the network.
 
 ### Footer, log and assistant
 
-The footer is on every tab with transport, a seek bar, volume and download. A track menu key opens every audio action for the loaded track, grouped, with a row per stem that sends that stem to EDIT, the init slot, the inpaint slot or the Chimera stack. The action key beside it changes with the tab (CREATE, EDIT, TRAIN, MIX, DJ), showing a progress fill while the job runs and cancelling it on a second press. Repeat is off, all or one; an output picker chooses the audio device; a Master FX chip is reachable from any tab; Ctrl+S saves the project.
+The footer is on every tab with transport, a seek bar, volume and download. A track menu key opens every audio action for the loaded track, grouped, with a row per stem that sends that stem to EDIT, the init slot, the inpaint slot or the Chimera stack. The action key beside it changes with the tab (CREATE, EDIT, TRAIN, MIX, DJ), showing a progress fill while the job runs and cancelling it on a second press. Repeat is off, all or one; an output picker chooses the audio device; a Master FX chip is reachable from any tab; Ctrl+S saves the project. A camera key in the header, or F9, records the app window with its sound into a WebM file.
 
 Status notices go to the processing log and to the assistant orb's speech bubble. The log keeps the last 500 entries, filters to errors only, and carries a live GPU, VRAM, CPU and RAM readout.
 
-The assistant orb streams chat from any configured provider (Claude Code over the CLI, Gemini, Anthropic, OpenAI, Grok, Groq, OpenRouter, Ollama, LM Studio, llama.cpp, vLLM), accepts attachments, and answers questions from theDAW's own documentation through a RAG index. Point it at Ollama or LM Studio and the assistant stays local too.
+The assistant orb streams chat from any configured provider (Claude Code over the CLI, Gemini, Anthropic, OpenAI, Grok, Groq, OpenRouter, Ollama, LM Studio, llama.cpp, vLLM), accepts attachments, and answers questions from theDAW's own documentation through a RAG index. Point it at Ollama or LM Studio and the assistant stays local too. It keeps its chat history across sessions, asks before it acts in Ask mode, and works on the project through tools: tracks and roll parts, composer and score calls, sound banks and tuning.
 
 ---
 
@@ -275,6 +291,8 @@ The Python dependency set self-selects per platform through `uv`:
 | macOS | Standard PyPI torch (CPU / MPS) | Small model recommended; flash-attention, Azure Kinect, and the Magenta sidecar are skipped automatically. |
 
 The Small generation model runs on CPU, so machines without an NVIDIA GPU still generate audio. The Medium model, Magenta, Demucs and GPU whisper want an NVIDIA driver of 580 or newer: the torch build is a CUDA 13 wheel, which needs the R580 driver branch.
+
+Live VST3 (instruments, plugin windows and hosted effects in EDIT, PERFORM and the piano roll) runs in theDAW's native plugin host. The host is Windows-only and built from source, and the launcher does not build it: with CMake and a C++17 toolchain installed, run `powershell -File install\setup.ps1 -VstHost` in `app/`. Without the host, VST3 effects still process offline.
 
 ## Themes and layout
 
@@ -434,6 +452,9 @@ The full manual ships with the app, is served by the Docs button in the UI, and 
 | [prompting.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/prompting.md) | How to write prompts, conditioning signals, and a style reference. |
 | [notation-and-score.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/notation-and-score.md) | Audio to MIDI, sheet music, tabs, arrangements and play-along. |
 | [sing-along-and-lyrics.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/sing-along-and-lyrics.md) | Where lyrics come from, ALIGN and the review pass, tapping, LRC. |
+| [sound-banks-and-midi-out.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/sound-banks-and-midi-out.md) | Sound banks, how a track picks a sound, MIDI out, and printing a VST3 instrument. |
+| [song-sections.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/song-sections.md) | The section finder: boundaries, repeat letters, roles and confidence. |
+| [edit-automation.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/edit-automation.md) | Automation lanes in EDIT, including the volume line. |
 | [nodefi.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/nodefi.md) | Node graphs: AI pipelines and live performance. |
 | [sway-perform-live.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/sway-perform-live.md) | PERFORM, the SwayCommand deck, scenes, punches and templates. |
 | [dj-and-genealogy.md](https://github.com/gantasmo/theDAW/blob/main/docs/guides/dj-and-genealogy.md) | The DJ console, the LEARN graph and the watch-link broadcast. |
