@@ -191,5 +191,35 @@ module.exports = {
         "npm run build:renderer:embed"
       ]
     }
+  }, {
+    // Live VST3 (instruments, plugin windows, hosted effects) runs in the
+    // app's native plugin host, a Windows-only C++ program that is never
+    // committed, so a clone has none until build.ps1 makes it. Pinokio's AI
+    // bundle installs the Visual Studio Build Tools, build.ps1 finds them
+    // through vswhere, and CMake comes from conda. conda's CMake is installed
+    // even when another cmake is on PATH: build.ps1 takes the newest Visual
+    // Studio its cmake can generate for, and an old cmake skips a current
+    // Visual Studio for an older one that may have no compiler.
+    // CMAKE_GENERATOR is cleared so build.ps1 picks the Visual Studio
+    // generator itself: Pinokio's own cmake module sets it to MinGW Makefiles.
+    // -NoWerror because a user's compiler is not the one CI builds with.
+    // Tolerant on purpose: the host is optional and must not fail Update.
+    // Pinokio ends a step with an error as soon as its output matches
+    // /error:/i or /errno /i, whatever the exit code, so both patterns are
+    // switched off here and the `||` fallback says what happened.
+    // build-vst-host.json runs the same build and reports a failure.
+    when: "{{platform === 'win32' && exists('app/native/vst-host/build.ps1')}}",
+    method: "shell.run",
+    params: {
+      path: "app",
+      on: [
+        { event: "/error:/i", break: false },
+        { event: "/errno /i", break: false }
+      ],
+      message: [
+        "conda install -y -c conda-forge cmake || echo theDAW: CMake could not be installed, so the live VST3 host is skipped.",
+        "(set \"CMAKE_GENERATOR=\" & powershell -NoProfile -ExecutionPolicy Bypass -File native\\vst-host\\build.ps1 -NoWerror) || echo theDAW: the live VST3 host did not build. Everything else works. Run Build VST3 Host from the launcher menu to see the error."
+      ]
+    }
   }]
 }

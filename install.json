@@ -160,6 +160,21 @@
       }
     },
     {
+      "when": "{{platform === 'win32' && exists('app/native/vst-host/build.ps1')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "on": [
+          { "event": "/error:/i", "break": false },
+          { "event": "/errno /i", "break": false }
+        ],
+        "message": [
+          "conda install -y -c conda-forge cmake || echo theDAW: CMake could not be installed, so the live VST3 host is skipped.",
+          "(set \"CMAKE_GENERATOR=\" & powershell -NoProfile -ExecutionPolicy Bypass -File native\\vst-host\\build.ps1 -NoWerror) || echo theDAW: the live VST3 host did not build. Everything else works. Run Build VST3 Host from the launcher menu to see the error."
+        ]
+      }
+    },
+    {
       "when": "{{platform === 'darwin' && !exists(path.resolve(os.homedir(), '.cache', 'huggingface', 'hub', 'models--stabilityai--stable-audio-3-small-music'))}}",
       "method": "shell.run",
       "params": {

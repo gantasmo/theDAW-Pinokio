@@ -1,0 +1,15 @@
+{
+  "run": [
+    {
+      "when": "{{platform === 'win32' && exists('app/native/vst-host/build.ps1')}}",
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "message": [
+          "conda install -y -c conda-forge cmake",
+          "set \"CMAKE_GENERATOR=\" & powershell -NoProfile -ExecutionPolicy Bypass -File native\\vst-host\\build.ps1 -NoWerror || echo error: the live VST3 host did not build. The compiler output is above."
+        ]
+      }
+    }
+  ]
+}
