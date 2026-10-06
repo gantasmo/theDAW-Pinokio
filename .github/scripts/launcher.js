@@ -61,6 +61,20 @@ if (command === "vj-env") {
   steps("update.js")
   steps("reset.js")
 
+  // Pinokio fails a step when its terminal output matches /error:/i or
+  // /errno /i, and the terminal echoes the command it was given. A command
+  // whose own text matches would fail its step every time it ran.
+  for (const name of fs.readdirSync(root)) {
+    if (!(name.endsWith(".json") && name !== "pinokio.json") && !["update.js", "reset.js"].includes(name)) continue
+    for (const step of steps(name)) {
+      const off = ((step.params && step.params.on) || []).filter((h) => h.break === false).map((h) => h.event)
+      for (const line of lines(step)) {
+        if (/error:/i.test(line) && !off.includes("/error:/i")) fail(`${name}: the command itself matches /error:/i: ${line}`)
+        if (/errno /i.test(line) && !off.includes("/errno /i")) fail(`${name}: the command itself matches /errno /i: ${line}`)
+      }
+    }
+  }
+
   // Install and Update run the same steps in the VJ checkout.
   if (JSON.stringify(vjSteps("install.json")) !== JSON.stringify(vjSteps("update.js"))) fail("install.json and update.js run different steps in app/vj")
 

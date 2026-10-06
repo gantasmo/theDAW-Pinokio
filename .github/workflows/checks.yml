@@ -33,6 +33,21 @@ jobs:
       - name: Every script parses and the menu shows the right entries
         run: node .github/scripts/launcher.js validate
 
+  # Pinokio decides whether a step failed from its terminal output. This loads
+  # that code from pinokiod as it ships and asks it about the host build steps.
+  pinokio-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pinokio's engine
+        run: |
+          git clone --depth 1 https://github.com/pinokiocomputer/pinokiod pinokiod
+          echo "pinokiod at $(git -C pinokiod log -1 --format=%h)" | tee -a "$GITHUB_STEP_SUMMARY"
+          cd pinokiod && npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Each host build step, through kernel/shells.js
+        run: node .github/scripts/pinokio-rules.js pinokiod | tee -a "$GITHUB_STEP_SUMMARY"
+
   # gantasmo/theDAW-Pinokio#5. sharp, a VJ-9000 dependency, builds from source
   # when pkg-config finds a system libvips new enough for it, and that build
   # stops at a missing node-addon-api. Arch carries a current libvips, which
