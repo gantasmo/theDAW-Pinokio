@@ -203,6 +203,10 @@ module.exports = {
     // CMAKE_GENERATOR is cleared so build.ps1 picks the Visual Studio
     // generator itself: Pinokio's own cmake module sets it to MinGW Makefiles.
     // -NoWerror because a user's compiler is not the one CI builds with.
+    // build-vst-host.ps1 runs build.ps1. When build.ps1 reports that no
+    // Visual Studio with the C++ build tools was found, it installs the Build
+    // Tools with the "Desktop development with C++" workload, which is what
+    // that message asks for, and builds again.
     // Tolerant on purpose: the host is optional and must not fail Update.
     // Pinokio ends a step with an error as soon as its output matches
     // /error:/i or /errno /i, whatever the exit code, so both patterns are
@@ -218,7 +222,7 @@ module.exports = {
       ],
       message: [
         "conda install -y -c conda-forge cmake || echo theDAW: CMake could not be installed, so the live VST3 host is skipped.",
-        "(set \"CMAKE_GENERATOR=\" & powershell -NoProfile -ExecutionPolicy Bypass -File native\\vst-host\\build.ps1 -NoWerror) || echo theDAW: the live VST3 host did not build. Everything else works. Run Build VST3 Host from the launcher menu to see the error."
+        "(powershell -NoProfile -ExecutionPolicy Bypass -File ..\\build-vst-host.ps1) || echo theDAW: the live VST3 host did not build. Everything else works. Run Build VST3 Host from the launcher menu to see the error."
       ]
     }
   }]

@@ -7,7 +7,7 @@
         "path": "app",
         "message": [
           "conda install -y -c conda-forge cmake",
-          "set \"CMAKE_GENERATOR=\" & powershell -NoProfile -ExecutionPolicy Bypass -File native\\vst-host\\build.ps1 -NoWerror || echo e^rror: the live VST3 host did not build. The compiler output is above."
+          "powershell -NoProfile -ExecutionPolicy Bypass -File ..\\build-vst-host.ps1 || echo e^rror: the live VST3 host did not build. The compiler output is above."
         ]
       }
     }
