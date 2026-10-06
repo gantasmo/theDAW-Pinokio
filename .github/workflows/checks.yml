@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # The theDAW ref whose host sources the Windows job builds.
+  THEDAW_REF: fix-vst-host-vs2026-generator
+
 concurrency:
   group: checks-${{ github.ref }}
   cancel-in-progress: true
@@ -36,12 +40,23 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux:latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # 11.16.0 is the npm of the report, the one Pinokio's Node carried.
+        # "image" is the npm Arch ships: npm 12 blocks install scripts until
+        # they are approved, so sharp's check does not run during the install.
+        npm: ['11.16.0', image]
     steps:
       - name: A system libvips, Node and a compiler
         run: pacman -Syu --noconfirm --needed git nodejs npm libvips pkgconf base-devel python
+      - name: npm ${{ matrix.npm }}
+        if: matrix.npm != 'image'
+        run: npm install -g npm@${{ matrix.npm }}
       - uses: actions/checkout@v7
-      - name: The system libvips sharp will find
-        run: pkg-config --modversion vips-cpp
+      - name: Versions
+        run: |
+          echo "node $(node --version), npm $(npm --version), system libvips $(pkg-config --modversion vips-cpp)" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Clone VJ-9000 the way Install does
         run: |
           git clone --depth 1 https://github.com/gantasmo/VJ-9000 vj
@@ -50,25 +65,27 @@ jobs:
         run: |
           cd vj-plain
           if npm install > ../plain.log 2>&1; then
-            echo "The plain install succeeded: this image does not reproduce the failure." | tee -a "$GITHUB_STEP_SUMMARY"
+            grep -n "install-scripts\|allow-scripts" ../plain.log | head -8 || true
+            echo "Plain install: succeeded." | tee -a "$GITHUB_STEP_SUMMARY"
           else
             grep -nE "node-addon-api|build from source" ../plain.log | head -5 || tail -20 ../plain.log
-            echo "The plain install failed, as reported in #5." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Plain install: failed, as reported in #5." | tee -a "$GITHUB_STEP_SUMMARY"
           fi
-      - name: The environment install.json and update.js give the VJ install
-        run: node .github/scripts/launcher.js vj-env | tee -a "$GITHUB_ENV"
-      - name: npm install with that environment
-        run: cd vj && npm install
+      - name: The steps install.json runs in app/vj, in order, with their environment
+        run: |
+          node .github/scripts/launcher.js vj-script install.json | tee vj-steps.sh
+          cd vj
+          bash ../vj-steps.sh
       - name: sharp loads with its own libvips
         run: |
           cd vj
           at="$(npm ls sharp --all --parseable | head -1)"
           test -n "$at" || { echo "VJ-9000 no longer installs sharp"; exit 1; }
-          node -e "const s = require(process.argv[1]); console.log('sharp', s.versions.sharp, 'with libvips', s.versions.vips)" "$at" | tee -a "$GITHUB_STEP_SUMMARY"
+          node -e "const s = require(process.argv[1]); console.log('sharp', s.versions.sharp, 'loads with libvips', s.versions.vips)" "$at" | tee -a "$GITHUB_STEP_SUMMARY"
 
-  # The live VST3 host. The runner has Visual Studio 2022 with the C++
-  # workload, which is what Pinokio's AI bundle installs as Build Tools, and
-  # Miniconda, which stands in for Pinokio's conda.
+  # The live VST3 host. The runner has one Visual Studio with the C++ workload
+  # (2026 on the windows-2025-vs2026 image; Pinokio's AI bundle installs the
+  # 2022 Build Tools) and Miniconda, which stands in for Pinokio's conda.
   vst-host-windows:
     runs-on: windows-latest
     timeout-minutes: 30
@@ -77,9 +94,14 @@ jobs:
       - name: theDAW's host sources where the launcher expects them
         shell: bash
         run: |
-          git clone --depth 1 --filter=blob:none --sparse https://github.com/gantasmo/theDAW app
+          git clone --depth 1 --branch "$THEDAW_REF" --filter=blob:none --sparse https://github.com/gantasmo/theDAW app
           git -C app sparse-checkout set native/vst-host
           test -f app/native/vst-host/build.ps1
+      - name: The Visual Studio installs on this machine
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property catalog_productDisplayVersion -format value | ForEach-Object { "Visual Studio with the C++ tools: $_" } | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
+          "theDAW ref: $env:THEDAW_REF" | Tee-Object -Append $env:GITHUB_STEP_SUMMARY
       - name: The lines of build-vst-host.json, typed into cmd with conda active
         shell: pwsh
         run: |

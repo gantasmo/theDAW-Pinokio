@@ -4,6 +4,7 @@
 //   node .github/scripts/launcher.js validate
 //   node .github/scripts/launcher.js vj-env            KEY=VALUE lines
 //   node .github/scripts/launcher.js lines <script>    the host build step's shell lines
+//   node .github/scripts/launcher.js vj-script <script> the app/vj steps as a bash script
 const fs = require("fs")
 const path = require("path")
 
@@ -29,6 +30,12 @@ const vjInstall = (name) =>
   one(name, (s) => s.params && s.params.path === "app/vj" && lines(s).join(" ") === "npm install", "VJ npm install step")
 const hostBuild = (name) => one(name, (s) => lines(s).join(" ").includes("build.ps1"), "host build step")
 
+// The steps a script runs inside app/vj, in order, each with its environment.
+const vjSteps = (name) =>
+  steps(name)
+    .filter((s) => s.params && s.params.path === "app/vj")
+    .map((s) => ({ env: s.params.env || {}, lines: lines(s) }))
+
 const command = process.argv[2]
 
 if (command === "vj-env") {
@@ -37,6 +44,13 @@ if (command === "vj-env") {
   if (JSON.stringify(install) !== JSON.stringify(update)) fail("install.json and update.js give the VJ install different environments")
   if (!Object.keys(install).length) fail("the VJ install sets no environment")
   for (const [key, value] of Object.entries(install)) console.log(`${key}=${value}`)
+} else if (command === "vj-script") {
+  const out = ["set -e"]
+  for (const step of vjSteps(process.argv[3])) {
+    const env = Object.entries(step.env).map(([key, value]) => `export ${key}=${JSON.stringify(String(value))}; `).join("")
+    for (const line of step.lines) out.push(`( ${env}${line} )`)
+  }
+  console.log(out.join("\n"))
 } else if (command === "lines") {
   for (const line of lines(hostBuild(process.argv[3]))) console.log(line)
 } else if (command === "validate") {
@@ -46,6 +60,9 @@ if (command === "vj-env") {
   }
   steps("update.js")
   steps("reset.js")
+
+  // Install and Update run the same steps in the VJ checkout.
+  if (JSON.stringify(vjSteps("install.json")) !== JSON.stringify(vjSteps("update.js"))) fail("install.json and update.js run different steps in app/vj")
 
   // Install and Update build the host with the same lines, and neither can be
   // failed by Pinokio's default error patterns.
@@ -87,5 +104,5 @@ if (command === "vj-env") {
     console.log(`launcher: every script parses and ${cases.length} menu states are right`)
   })()
 } else {
-  fail("usage: launcher.js validate | vj-env | lines <script>")
+  fail("usage: launcher.js validate | vj-env | lines <script> | vj-script <script>")
 }
