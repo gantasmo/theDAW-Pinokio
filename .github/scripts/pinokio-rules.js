@@ -136,6 +136,38 @@ const expect = async (label, params, chunks, wantError) => {
   const button = hostBuild("build-vst-host.json")
   await expect("build-vst-host.json, the host builds", button.params, session(button, true), false)
   await expect("build-vst-host.json, the host build fails", button.params, session(button, false), true)
+
+  // Pinokio drops a conda command that would change its own base environment
+  // (kernel/shell_conda_runtime_guard.js) and carries on without it. Every
+  // conda line the launcher sends has to come through that guard untouched.
+  const guard = require(path.join(pinokiod, "kernel", "shell_conda_runtime_guard.js"))
+  for (const name of ["install.json", "update.js", "build-vst-host.json"]) {
+    for (const step of steps(name)) {
+      const lines = [].concat((step.params && step.params.message) || [])
+      if (step.method !== "shell.run" || !lines.some((line) => /\bconda\b/.test(line))) continue
+      const when = step.when || ""
+      const platforms = ["win32", "linux", "darwin"].filter((p) => !/platform/.test(when) || new RegExp(`platform === '${p}'`).test(when) || (/platform !== '/.test(when) && !new RegExp(`platform !== '${p}'`).test(when)))
+      for (const platform of platforms) {
+        const home = platform === "win32" ? "C:\\pinokio" : "/home/user/pinokio"
+        const join = platform === "win32" ? path.win32.join : path.posix.join
+        const appPath = join(home, "api", "theDAW-Pinokio.git")
+        const params = JSON.parse(JSON.stringify(step.params))
+        const result = guard.applyCondaRuntimeGuard(params, {
+          appPath,
+          cwd: appPath,
+          managedBasePrefix: join(home, "bin", "miniforge"),
+          ondata: () => {},
+          platform,
+          sessionKey: `launcher-${name}-${platform}-${Math.random()}`,
+          shellName: platform === "win32" ? "cmd.exe" : "bash",
+        })
+        const kept = result.skipped.length === 0 && JSON.stringify([].concat(params.message)) === JSON.stringify(lines)
+        const label = `${name} on ${platform}: ${lines.find((line) => /\bconda\b/.test(line)).slice(0, 70)}`
+        console.log(`${kept ? "ok  " : "FAIL"} ${label}: Pinokio's conda guard ${kept ? "leaves it as written" : `changes it (${JSON.stringify(result.skipped)})`}`)
+        if (!kept) failures.push(label)
+      }
+    }
+  }
   if (failures.length) {
     console.error(`pinokio-rules: ${failures.length} wrong: ${failures.join("; ")}`)
     process.exit(1)
