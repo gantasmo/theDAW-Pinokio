@@ -29,10 +29,11 @@ Install and Start below handle the whole stack: Python, CUDA, FFmpeg, the fronte
 
 ## What the launcher does
 
-- **Install** clones the repo into `app/`, pulls the Magenta sidecar submodule, installs FFmpeg through conda, resolves all Python dependencies with `uv sync --group dev`, builds the optional Underfit trainer environment, installs the frontend and VST Foundry packages with `npm install`, clones the VJ-9000 app, clones or refreshes the SwayCommand cockpit for the SWAY tab and builds it, and pre-fetches the default generation model from the public mirror (Medium on Windows and Linux, Small on macOS) so the first CREATE does not wait on a download.
+- **Install** clones the repo into `app/`, pulls the Magenta sidecar submodule, installs FFmpeg through conda, resolves all Python dependencies with `uv sync --group dev`, builds the optional Underfit trainer environment, installs the frontend and VST Foundry packages with `npm install`, clones the VJ-9000 app, clones or refreshes the SwayCommand cockpit for the SWAY tab and builds it, builds the live VST3 host on Windows, and pre-fetches the default generation model from the public mirror (Medium on Windows and Linux, Small on macOS) so the first CREATE does not wait on a download.
 - **Start** launches the FastAPI backend through its restart supervisor on `http://localhost:8600`, then the Vite frontend on `http://localhost:5173`, and opens the app once the URL appears. Settings → Restart Server works under the launcher: the backend comes back inside the same Pinokio terminal.
-- **Update** pulls the launcher, moves the app clone onto the published `main` with a fetch and a hard reset so a lockfile the last run rewrote cannot block it, refreshes the submodule, re-syncs the Python, Underfit and npm dependencies, re-provisions the VJ app if it is missing, and refreshes and rebuilds the SwayCommand cockpit. Untracked content stays put: `app/data`, `app/vj`, the venvs, `node_modules` and the downloaded models.
+- **Update** pulls the launcher, moves the app clone onto the published `main` with a fetch and a hard reset so a lockfile the last run rewrote cannot block it, refreshes the submodule, re-syncs the Python, Underfit and npm dependencies, re-provisions the VJ app if it is missing, refreshes and rebuilds the SwayCommand cockpit, and rebuilds the live VST3 host on Windows. Untracked content stays put: `app/data`, `app/vj`, the venvs, `node_modules` and the downloaded models.
 - **Reset** deletes the dependency trees only: `app/.venv`, `app/underfit/.venv`, and the `node_modules` folders of the frontend, VST Foundry and VJ app. Your library, settings and generated audio under `app/data` stay put. The next Install rebuilds the dependencies from clean.
+- **Build VST3 Host** (Windows only) compiles theDAW's native plugin host and shows the compiler output. Install and Update run the same build and carry on when it fails, so this is the button to press when VST3 plugins do not play live.
 
 The other Stable Audio 3 checkpoints are one click away under **Download Models** (Small ARC, Small RF, Medium ARC, Medium RF), and theDAW also downloads any model the first time a generation needs it. The launcher points `HF_HOME` at the standard user Hugging Face cache (`~/.cache/huggingface`) rather than an isolated per-app cache, so checkpoints and the Hugging Face auth token already on the machine are reused. The official Stable Audio 3 and t5gemma repos are gated; the app falls back to a public mirror of the same weights automatically, and a Hugging Face token (the in-app sign-in, or `hf auth login`) unlocks the official repos.
 
@@ -177,7 +178,7 @@ Every song in the library is torn into bar- and beat-aligned fragments of each s
 
 <p align="center"><img src="https://raw.githubusercontent.com/gantasmo/theDAW/main/docs/readme/sway.png" alt="The SwayCommand cockpit: the scene list, the timeline, and gesture axes bound to macro knobs and named pads" width="900"></p>
 
-SWAY embeds the [SwayCommand](https://github.com/danieljtrujillo/SwayCommand) cockpit whole: scenes down the left, a timeline underneath, and gesture axes (X, Y, PULSE, PRESS, SWAY) bound to macro knobs and named pads. Move in front of a camera, or move the Audima Labs Sway motion controller, and you are playing those controls. theDAW owns the only `requestMIDIAccess()` in the app and relays hardware into the cockpit, so a controller you plug in reaches it with no extra setup. A cockpit track's VST3 chain renders through theDAW, and LOAD .gan asks theDAW for the plugin file.
+SWAY embeds the [SwayCommand](https://github.com/danieljtrujillo/SwayCommand) cockpit whole: scenes down the left, a timeline underneath, and gesture axes (X, Y, PULSE, PRESS, SWAY) bound to macro knobs and named pads. Move in front of a camera, or move the Audima Labs Sway motion controller, and you are playing those controls. theDAW owns the only `requestMIDIAccess()` in the app and relays hardware into the cockpit, so a controller you plug in reaches it with no extra setup. Click a track's name on the cockpit's timeline to open its panel: EFFECTS lists every effect of theDAW's rack, and the VST3 list runs scanned plugins live in theDAW's plugin host. The kit and the synth have effect chains of their own, and LOAD .gan asks theDAW for the plugin file.
 
 ### Connect nodes: NODEFI
 
@@ -292,7 +293,7 @@ The Python dependency set self-selects per platform through `uv`:
 
 The Small generation model runs on CPU, so machines without an NVIDIA GPU still generate audio. The Medium model, Magenta, Demucs and GPU whisper want an NVIDIA driver of 580 or newer: the torch build is a CUDA 13 wheel, which needs the R580 driver branch.
 
-Live VST3 (instruments, plugin windows and hosted effects in EDIT, PERFORM and the piano roll) runs in theDAW's native plugin host. The host is Windows-only and built from source, and the launcher does not build it: with CMake and a C++17 toolchain installed, run `powershell -File install\setup.ps1 -VstHost` in `app/`. Without the host, VST3 effects still process offline.
+Live VST3 (instruments, plugin windows and hosted effects in EDIT, PERFORM and the piano roll) runs in theDAW's native plugin host. The host is Windows-only and built from source. Install and Update build it with the Visual Studio Build Tools that Pinokio's AI bundle installs, and with CMake, which the launcher installs through conda when none is on the PATH. **Build VST3 Host** in the launcher menu runs the build by itself. Without the host, VST3 effects still process offline.
 
 ## Themes and layout
 
@@ -482,6 +483,8 @@ The GitHub [Wiki](https://github.com/gantasmo/theDAW/wiki) has the same index ac
 **Out of memory on the Medium model.** Use the `small` model, a shorter duration, or close other CUDA processes.
 
 **Static or noise from the Medium model on Windows.** Check `GET /api/health` for `flash_attention_active`. On Turing GPUs (RTX 20xx, GTX 16xx) it reads false by design and the model runs on an equivalent fallback.
+
+**VST3 plugins do not play live.** Live VST3 needs the native plugin host, which exists on Windows only. Stop the app, press **Build VST3 Host** and read the output. The build needs the Visual Studio Build Tools with the C++ workload.
 
 **A dependency tree got wedged.** Run **Reset**, then **Install**. Reset removes only the dependency trees; your library, settings and audio under `app/data` are untouched.
 

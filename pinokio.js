@@ -37,6 +37,15 @@ module.exports = {
     * 
     **********************************************************************************************/
     let installed = info.exists("app/.venv") && info.exists("app/frontend/node_modules")
+    // The live VST3 host is a Windows-only C++ program that Install and Update
+    // build. This entry runs the same build on demand and shows the compiler's
+    // output, for an install made before the launcher built the host and for a
+    // build that failed.
+    let vst_host_menu = kernel.platform === "win32" && info.exists("app/native/vst-host/build.ps1") ? [{
+      icon: "fa-solid fa-hammer",
+      text: info.exists("app/native/vst-host/bin/thedaw-vst-host.exe") ? "Rebuild VST3 Host" : "Build VST3 Host",
+      href: "build-vst-host.json",
+    }] : []
     let downloading = [
       "download-small-arc.json",
       "download-small-rf.json",
@@ -56,6 +65,7 @@ module.exports = {
       start: info.running("start.json"),
       update: info.running("update.js"),
       reset: info.running("reset.js"),
+      vst_host: info.running("build-vst-host.json"),
     }
     if (running.install) {
       return [{
@@ -92,6 +102,13 @@ module.exports = {
           icon: 'fa-solid fa-terminal',
           text: "Updating",
           href: "update.js",
+        }]
+      } else if (running.vst_host) {
+        return [{
+          default: true,
+          icon: 'fa-solid fa-terminal',
+          text: "Building VST3 Host",
+          href: "build-vst-host.json",
         }]
       } else if (running.reset) {
         return [{
@@ -137,7 +154,7 @@ module.exports = {
           icon: "fa-solid fa-plug",
           text: "Install",
           href: "install.json",
-        }, {
+        }, ...vst_host_menu, {
           icon: "fa-regular fa-circle-xmark",
           text: "Reset",
           href: "reset.js",
