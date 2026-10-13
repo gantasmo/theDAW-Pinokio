@@ -33,23 +33,26 @@
       "method": "shell.run",
       "params": {
         "path": "app/frontend",
-        "env": {},
+        "env": {
+          "NO_COLOR": "1",
+          "FORCE_COLOR": "0"
+        },
         "message": [
           "npm run dev"
         ],
         "on": [
           {
-            "event": "/http://[^\\s\\n\\r]+/",
+            "event": "/(http:\\/\\/(?:localhost|127\\.0\\.0\\.1)[0-9:]*)/",
             "done": true
           }
         ]
       }
     },
     {
-      "when": "{{input && input.event && Array.isArray(input.event) && input.event.length > 0}}",
+      "when": "{{input && input.event && Array.isArray(input.event) && input.event.length > 1}}",
       "method": "local.set",
       "params": {
-        "url": "{{input.event[0]}}"
+        "url": "{{input.event[1]}}"
       }
     }
   ]
